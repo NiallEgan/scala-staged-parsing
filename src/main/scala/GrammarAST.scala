@@ -1,10 +1,10 @@
-sealed abstract class GrammarNode
-case class Eps extends GrammarNode
-case class Character(c: Char) extends GrammarNode
-case class Bot extends GrammarNode
-case class Seq(left: GrammarNode, right: GrammarNode) extends GrammarNode
-case class Alt(left: GrammarNode, right: GrammarNode) extends GrammarNode
-case class Star(a: GrammarNode) extends GrammarNode
-case class Fix(v: Var, a: GrammarNode) extends GrammarNode
-case class Var(v: DBVar) extends GrammarNode
-//case class Map(f: Grammar )
+sealed abstract class GrammarNode[Ctx, T]
+case class Eps[Ctx]() extends GrammarNode[Ctx, Unit]
+case class Character[Ctx](c: Char) extends GrammarNode[Ctx, Char]
+case class Bot[Ctx]() extends GrammarNode[Ctx, Nothing]
+case class Seq[Ctx, T, U](left: GrammarNode[Ctx, T], right: GrammarNode[Ctx, U]) extends GrammarNode[Ctx, (T, U)]
+case class Alt[Ctx, T](left: GrammarNode[Ctx, T], right: GrammarNode[Ctx, T]) extends GrammarNode[Ctx, T]
+case class Star[Ctx, T](a: GrammarNode[Ctx, T]) extends GrammarNode[Ctx, T]
+case class Fix[Ctx, T](a: GrammarNode[(T, Ctx), T]) extends GrammarNode[Ctx, T]
+case class Var[Ctx, T](v: DBVar[Ctx, T]) extends GrammarNode[Ctx, T]
+case class Map[Ctx, T, U](f: T => U, a: GrammarNode[Ctx, T]) extends GrammarNode[Ctx, U]

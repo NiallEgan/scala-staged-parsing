@@ -4,7 +4,7 @@ import scalaz._
 import Scalaz._
 // TODO: Generalize return type
 
-abstract class TypedParser[T](val isNullable: Boolean, val firstSet: Set[Char]) {
+sealed abstract class TypedParser[T](val isNullable: Boolean, val firstSet: Set[Char]) {
   def hasInFirstSet(c: Char): Boolean =
     firstSet.contains(c)
 
@@ -72,7 +72,7 @@ class EpsParser(isNullable: Boolean, firstSet: Set[Char],
   }
 }
 
-class StarParse[T](isNullable: Boolean, firstSet: Set[Char],
+class StarParser[T](isNullable: Boolean, firstSet: Set[Char],
                    val parser1: TypedParser[T])
                    extends TypedParser[List[T]](isNullable, firstSet) {
   // TODO: Tail recursion
