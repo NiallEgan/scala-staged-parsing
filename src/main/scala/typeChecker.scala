@@ -2,7 +2,7 @@ import scalaz._
 import Scalaz._
 
 object TypeEnv extends Env {
-  override type T[+_] = ParserType
+  override type T[_] = ParserType
 }
 
 class ParserType(val first: Set[Char],
@@ -20,8 +20,6 @@ class ParserType(val first: Set[Char],
 
 
 object TypeChecker {
-
-
   private def seqType(t1: TypeEnv.T[_], t2: TypeEnv.T[_]) = {
     new ParserType(
       t1.first,
@@ -33,54 +31,69 @@ object TypeChecker {
     )
   }
 
-  def suc(a: TypeEnv.T[_]) = a.right[String]
-  def err(a: String) = a.left[TypeEnv.T[_]]
+  def suc[Ctx, T](a: TypedGrammarNode[Ctx, T]) = a.right[String]
+  def err[Ctx, T](a: String) = a.left[TypedGrammarNode[Ctx, T]]
 
   def pType[Ctx, A](typeContext: TypeEnv.Context[Ctx], exp: GrammarNode[Ctx, A]):
-    \/[String, TypeEnv.T[A]] = {
+    \/[String, TypedGrammarNode[Ctx, A]] = {
     exp match {
-      case Eps() => suc(new ParserType(Set(), Set(), true, true))
-      case Character(c) => suc(new ParserType(Set(c), Set(), false, true))
-      case Bot() => suc(new ParserType(Set(), Set(), false, true))
+      case Eps() => suc(TEps(new ParserType(Set(), Set(), true, true)))
+      case Character(c) => suc(TCharacter(new ParserType(Set(c), Set(), false, true), c))
+      //case Bot() => suc(TBot(new ParserType(Set(), Set(), false, true)))
       case Alt(left, right) => {
-        pType(typeContext, left) >>= (leftType =>
-        pType(typeContext, right) >>= (rightType =>
+        pType(typeContext, left) >>= (leftTypedNode => {
+        pType(typeContext, right) >>= (rightTypedNode => {
+          val leftType = leftTypedNode.tp
+          val rightType = rightTypedNode.tp
           if (leftType hash rightType) {
-            suc(new ParserType(
+            suc(TAlt(new ParserType(
              leftType.first ++ rightType.first,
              leftType.follow ++ rightType.follow,
              leftType.nullable || rightType.nullable,
-             leftType.guarded && rightType.guarded))
+             leftType.guarded && rightType.guarded), leftTypedNode, rightTypedNode))
           } else err(f"Type Error: The alternatives $left and $right are ambiguous.")
-          ))
+          })})
         }
 
       case Seq(left, right) => {
-        pType(typeContext, left) >>= (leftType =>
-        pType(typeContext, right) >>= (rightType =>
+        pType(typeContext, left) >>= (leftTypedNode => {
+        pType(typeContext, right) >>= (rightTypedNode => {
+          val leftType = leftTypedNode.tp
+          val rightType = rightTypedNode.tp
           if (leftType * rightType) {
-            suc(seqType(leftType, rightType))
+            suc(TSeq(seqType(leftType, rightType), leftTypedNode, rightTypedNode))
           } else err(f"Type Error: The sequence $left and $right are ambiguous.")
-        ))
+        })})
       }
-      case Var(v) => suc(TypeEnv.find(v, typeContext))
+      case Var(v) => suc(TVar(TypeEnv.find(v, typeContext), v))
       case Star(a) => {
-        for (innerType <- pType(typeContext, a);
-             t = seqType(innerType, innerType)) yield
-        new ParserType(t.first, innerType.first ++ innerType.follow,
-                           true, t.guarded)
+        for (typedNode <- pType(typeContext, a);
+             innerType = seqType(typedNode.tp, typedNode.tp)) yield
+        TStar(new ParserType(innerType.first, innerType.first ++ innerType.follow,
+                           true, innerType.guarded), typedNode)
       }
-      case Map(_, a) => pType(typeContext, a)
+      case PMap(f, a) => {
+        for(typedNode <- pType(typeContext, a))
+        yield TPMap(typedNode.tp, f, typedNode)
+      }
       case Fix(a) => {
         // TODO: Why does this work.
         val bottomType = new ParserType(Set(), Set(), false, false)
         val nextType: \/[String, TypeEnv.T[A]] => \/[String, TypeEnv.T[A]] =
-          x => x >>= ((t: TypeEnv.T[A]) => pType(TypeEnv.add(t, typeContext), a))
-        val iterTypes = Stream.iterate(suc(bottomType))(nextType)
-        ((iterTypes, iterTypes.tail).zipped.takeWhile
-              { case (t1, t2) => t1 != t2 }.last._1) >>= ((t: TypeEnv.T[A]) =>
-        if (!t.guarded) err(f"Type Error: $t is not guarded.")
-        else pType(TypeEnv.add(t, typeContext), a))
+          x => x >>= (
+            (t: TypeEnv.T[A]) => pType(TypeEnv.add(t, typeContext), a).map(_.tp)
+          )
+
+        val iterTypes = Stream.iterate(bottomType.right[String])(nextType)
+        val m = ((iterTypes, iterTypes.tail).zipped.takeWhile
+              { case (t1, t2) => t1 != t2 }.last._1)
+        m >>= ((t: TypeEnv.T[A]) =>
+              if (!t.guarded) err(f"Type Error: $t is not guarded.")
+              else {
+                for (tNode <- pType(TypeEnv.add(t, typeContext), a))
+                yield TFix(tNode.tp, tNode)
+              }
+        )
       }
     }
   }

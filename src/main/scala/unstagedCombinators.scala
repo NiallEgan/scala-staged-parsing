@@ -65,8 +65,8 @@ class BottomParser(isNullable: Boolean, firstSet: Set[Char])
   }
 }
 
-class EpsParser(isNullable: Boolean, firstSet: Set[Char],
-                val v: Char) extends TypedParser[Unit](isNullable, firstSet) {
+class EpsParser(isNullable: Boolean, firstSet: Set[Char])
+      extends TypedParser[Unit](isNullable, firstSet) {
   override def apply(it: BufferedIterator[Char]): \/[String, Unit] = {
     suc(())
   }
@@ -87,4 +87,13 @@ class StarParser[T](isNullable: Boolean, firstSet: Set[Char],
       } else suc(List())
     } else suc(List())
   }
+}
+
+class MapParser[T, U](isNullable: Boolean, firstSet: Set[Char],
+                      val parser: TypedParser[T], val f: T => U)
+                      extends TypedParser[U](isNullable, firstSet) {
+      override def apply(it: BufferedIterator[Char]): \/[String, U] = {
+        for (x <- parser(it)) yield f(x)
+      }
+
 }
