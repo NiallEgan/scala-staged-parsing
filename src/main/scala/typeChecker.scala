@@ -1,3 +1,5 @@
+package combi
+
 import scalaz._
 import Scalaz._
 
@@ -14,6 +16,7 @@ class ParserType(val first: Set[Char],
     }
 
     def *[T](other: ParserType): Boolean = {
+      // TODO: Check assoc here!
       (other.follow & follow).isEmpty && (!nullable)
     }
 }

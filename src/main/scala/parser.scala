@@ -1,8 +1,10 @@
+package combi
+
 import scalaz._
 import Scalaz._
 
 object ParserEnv extends Env {
-  override type T[X] = Id[X]
+  override type T[X] = TypedParser[X]
 }
 
 object Parser {
@@ -25,6 +27,11 @@ object Parser {
       }
       case TVar(_, n) => ParserEnv.find(n, con)
       case TPMap(_, f, a) => new MapParser(nullable, firstSet, parse(a, con), f)
+      case p@TFix(_, a) => {
+        lazy val p: TypedParser[T] = new FixParser(nullable, firstSet,
+          it => parse(a, ParserEnv.add(p, con))(it))
+        p
+      }
     }
   }
 }

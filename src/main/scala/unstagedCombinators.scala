@@ -1,3 +1,5 @@
+package combi
+
 import scala.collection.BufferedIterator
 import language.postfixOps
 import scalaz._
@@ -22,7 +24,7 @@ class AltParser[T](isNullable: Boolean, firstSet: Set[Char],
                    extends TypedParser[T](isNullable, firstSet) {
   override def apply(it: BufferedIterator[Char]): \/[String, T] = {
     if (it.hasNext) {
-      val c: Char = it.next()
+      val c: Char = it.head
       if (parser1 hasInFirstSet c) parser1(it)
       else if (parser2 hasInFirstSet c) parser2(it)
       else if (parser1 isNullable) parser1(it)
@@ -51,8 +53,8 @@ class CharParser(isNullable: Boolean, firstSet: Set[Char],
                  val c: Char) extends TypedParser[Char](isNullable, firstSet) {
   override def apply(it: BufferedIterator[Char]): \/[String, Char] = {
     if (it.hasNext) {
-      val d = it.next()
-      if (d == c) suc(d)
+      val d = it.head
+      if (d == c) suc(it.next())
       else err(f"Error: Expected $c, got $d.")
     } else err(f"Error: Expected $c, but reached end of input.")
   }
@@ -95,5 +97,10 @@ class MapParser[T, U](isNullable: Boolean, firstSet: Set[Char],
       override def apply(it: BufferedIterator[Char]): \/[String, U] = {
         for (x <- parser(it)) yield f(x)
       }
+}
 
+class FixParser[T](isNullable: Boolean, firstSet: Set[Char],
+                   f: BufferedIterator[Char] => \/[String, T])
+                  extends TypedParser[T](isNullable, firstSet) {
+        override def apply(it: BufferedIterator[Char]) = f(it)
 }

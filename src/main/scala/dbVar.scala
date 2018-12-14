@@ -1,3 +1,5 @@
+package combi
+
 import scala.language.higherKinds
 
 import scalaz._
