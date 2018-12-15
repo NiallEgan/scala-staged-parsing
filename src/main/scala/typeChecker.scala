@@ -7,10 +7,12 @@ object TypeEnv extends Env {
   override type T[_] = ParserType
 }
 
+
 class ParserType(val first: Set[Char],
                  val follow: Set[Char],
                  val nullable: Boolean,
                  val guarded: Boolean) {
+
     def hash[T](other: ParserType): Boolean = {
       !(other.nullable && nullable) && (other.first & first).isEmpty
     }
@@ -18,6 +20,18 @@ class ParserType(val first: Set[Char],
     def *[T](other: ParserType): Boolean = {
       // TODO: Check assoc here!
       (other.follow & follow).isEmpty && (!nullable)
+    }
+
+    override def equals(other: Any): Boolean = other match {
+      case o: ParserType => {
+        o.first == first && o.follow == follow &&
+        o.nullable == nullable && o.guarded == guarded
+      }
+      case _ => false
+    }
+
+    override def toString(): String = {
+      f"{first: $first, follow: $follow, nullable: $nullable, guarded: $guarded}"
     }
 }
 
@@ -32,6 +46,13 @@ object TypeChecker {
       false,
       t1.guarded
     )
+  }
+
+  private def fix_s[T](s: Stream[T], v: T): T = {
+    // TODO:  Use iterators, iterate while etc. 
+    val v1 = s.head
+    if (v1 == v) v
+    else fix_s(s.tail, v1)
   }
 
   def suc[Ctx, T](a: TypedGrammarNode[Ctx, T]) = a.right[String]
@@ -88,8 +109,9 @@ object TypeChecker {
           )
 
         val iterTypes = Stream.iterate(bottomType.right[String])(nextType)
-        val m = ((iterTypes, iterTypes.tail).zipped.takeWhile
-              { case (t1, t2) => t1 != t2 }.last._1)
+        println("Finding type")
+        val m = fix_s(iterTypes.tail, iterTypes.head)
+
         m >>= ((t: TypeEnv.T[A]) =>
               if (!t.guarded) err(f"Type Error: $t is not guarded.")
               else {

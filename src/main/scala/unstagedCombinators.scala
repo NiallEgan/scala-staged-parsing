@@ -100,7 +100,7 @@ class MapParser[T, U](isNullable: Boolean, firstSet: Set[Char],
 }
 
 class FixParser[T](isNullable: Boolean, firstSet: Set[Char],
-                   f: BufferedIterator[Char] => \/[String, T])
+                   f: BufferedIterator[Char] => \/[String, T]) // Is this right?
                   extends TypedParser[T](isNullable, firstSet) {
         override def apply(it: BufferedIterator[Char]) = f(it)
 }
