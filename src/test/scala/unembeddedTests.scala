@@ -159,6 +159,51 @@ class FixTests extends FlatSpec with UnembeddedTester {
         Seq(Character('b'), Var(IndexZ())))
       ))
 
+  def LSeqC[Ctx](a: GrammarNode[Ctx, Char],
+                 b: GrammarNode[Ctx, List[Char]]) = {
+    PMap((x: (Char, List[Char])) => x._1::x._2,
+         Seq(a, b))
+  }
+  def LSeqL[Ctx](a: GrammarNode[Ctx, List[Char]],
+                 b: GrammarNode[Ctx, List[Char]]) = {
+    PMap((x: (List[Char], List[Char])) => x._1 ++ x._2,
+         Seq(a, b))
+  }
+
+  val bracketsAGrammar: GrammarNode[Unit, List[Char]] =
+    Fix(Alt(
+      PMap((x: Char) => List(x), Character('a')),
+      LSeqC(Character('('),
+      LSeqL(Var(IndexZ()),
+      LSeqC(Character(')'),
+           Var(IndexZ()))
+      ))
+    ))
+
+    val dyckLanguage: GrammarNode[Unit, List[Char]] =
+      Fix(Alt(
+        PMap((x: Unit) => List(), Eps()),
+        LSeqL(
+          PMap((x: (List[Char], Char)) => x._1 ++ List(x._2),
+              Seq(
+              LSeqC(Character('('), Var(IndexZ())),
+              Character(')'))
+          ),
+          Var(IndexZ())
+        )
+      ))
+
+    val simpleBrackets: GrammarNode[Unit, List[Char]] =
+      Fix(Alt(
+        PMap((x: Unit) => List(), Eps()),
+        PMap((x: (List[Char], Char)) => x._1 ++ List(x._2),
+              Seq(
+                LSeqC(Character('('), Var(IndexZ())),
+                Character(')')
+              )
+        )
+      ))
+
   "The E ::= ac | bE grammar" should "match bbac" in {
     val (r, it) = test(g, "bbac")
     assertResult(List('b', 'b', 'a', 'c').right)(r)
@@ -168,6 +213,79 @@ class FixTests extends FlatSpec with UnembeddedTester {
   "The E ::= ac | bE grammar" should "match ac" in {
     val (r, it) = test(g, "ac")
     assertResult(List('a', 'c').right)(r)
+    assert(!it.hasNext)
+  }
+
+  "The E ::= ac | bE grammar" should "not matc ab" in {
+    val (r, it) = test(g, "ab")
+    assertResult(-\/("Error: Expected c, got b."))(r)
+    assert(it.hasNext)
+  }
+
+  "The a-brackets grammar" should "match (a)" in {
+    val s: String = "(a)a"
+    val typedGM = TypeChecker.pType(TypeEnv.CtxZ(), bracketsAGrammar)
+    println(typedGM)
+    val (r, it) = test(bracketsAGrammar, s)
+    assertResult(s.toList.right)(r)
+    assert(!it.hasNext)
+  }
+
+  "The a-brackets grammar" should "match ((a)a)a(a)a((a)a)a" in {
+    val s: String = "((a)a)(a)((a)a)a"
+    val typedGM = TypeChecker.pType(TypeEnv.CtxZ(), bracketsAGrammar)
+    println(typedGM)
+    val (r, it) = test(bracketsAGrammar, s)
+    assertResult(s.toList.right)(r)
+    assert(!it.hasNext)
+  }
+
+  "The brackets grammar" should "match ((()))" in {
+    val s: String = "((()))"
+    val (r, it) = test(simpleBrackets, s)
+    assertResult(s.toList.right)(r)
+    assert(!it.hasNext)
+  }
+
+  "The brackets grammar" should "match (())" in {
+    val s: String = "(())"
+    val (r, it) = test(simpleBrackets, s)
+    assertResult(s.toList.right)(r)
+    assert(!it.hasNext)
+  }
+
+  "The brackets grammar" should "not match ((())" in {
+    val s: String = "((())"
+    val (r, it) = test(simpleBrackets, s)
+    assertResult(-\/("Error: Expected ), but reached end of input."))(r)
+    assert(!it.hasNext)
+  }
+
+  "The Dyck grammar" should "match ((()))" in {
+    val s: String = "((()))"
+    val (r, it) = test(dyckLanguage, s)
+    assertResult(s.toList.right)(r)
+    assert(!it.hasNext)
+  }
+
+  "The Dyck grammar" should "match (()())()()((()())())()" in {
+    val s: String = "(()())()()((()())())()"
+    val (r, it) = test(dyckLanguage, s)
+    assertResult(s.toList.right)(r)
+    assert(!it.hasNext)
+  }
+
+  "The Dyck grammar" should "not match (()()))" in {
+    val s: String = "(()()))"
+    val (r, it) = test(dyckLanguage, s)
+    assertResult("(()())".toList.right)(r)
+    assert(it.hasNext)
+  }
+
+  "The Dyck grammar" should "not match (()())(()" in {
+    val s: String = "(()())(()"
+    val (r, it) = test(dyckLanguage, s)
+    assertResult(-\/("Error: Expected ), but reached end of input."))(r)
     assert(!it.hasNext)
   }
 }
