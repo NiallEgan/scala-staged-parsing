@@ -9,7 +9,13 @@ case class Alt[Ctx, T](left: GrammarNode[Ctx, T], right: GrammarNode[Ctx, T]) ex
 case class Star[Ctx, T](a: GrammarNode[Ctx, T]) extends GrammarNode[Ctx, List[T]]
 case class Fix[Ctx, T](a: GrammarNode[(T, Ctx), T]) extends GrammarNode[Ctx, T]
 case class Var[Ctx, T](v: DBVar[Ctx, T]) extends GrammarNode[Ctx, T]
-case class PMap[Ctx, T, U](f: T => U, a: GrammarNode[Ctx, T]) extends GrammarNode[Ctx, U]
+case class PMap[Ctx, T, U](f: T => U, a: GrammarNode[Ctx, T]) extends GrammarNode[Ctx, U] {
+  override def equals(that: Any): Boolean = that match {
+    // A slightly weakened equality so that we can easily compare trees
+    case PMap(_, that_a) => a == that_a
+    case _ => false
+  }
+}
 
 sealed abstract class TypedGrammarNode[Ctx, T](val tp: ParserType)
 case class TEps[Ctx](typ: ParserType) extends TypedGrammarNode[Ctx, Unit](typ)

@@ -62,7 +62,102 @@ class UnCompound2Spec extends FlatSpec with EmbeddedTester {
      Alt(left, right)
 
   "(a ~ b) <|> (a ~ c)" should "be unembedded to ..." in {
-    assertResult(g)(getClosedTerm(('a' ~ 'b') <|> ('a' ~ 'c')))
-  
+    // TODO: Type errors here??
+    val l: D[Unit, (Char, Char)] = 'a' ~ 'b'
+    val r: D[Unit, (Char, Char)] = 'a' ~ 'c'
+    assertResult(g)(getClosedTerm(l <|> r))
   }
+}
+
+class UnFixSpec extends FlatSpec with EmbeddedTester {
+  def p2l(x: (Char, Char)) = List(x._1, x._2)
+  def cons(x: (Char, List[Char])) = x._1::x._2
+  def app(x: (List[Char], Char)): List[Char] = x._1++List(x._2)
+  def concat(x: (List[Char], List[Char])) = x._1 ++ x._2
+
+
+  val g: GrammarNode[Unit, List[Char]] =
+    Fix(Alt(
+      PMap(
+        p2l,
+        Seq(Character('a'), Character('c'))),
+      PMap(
+        cons,
+        Seq(Character('b'), Var(IndexZ())))
+      ))
+
+  def LSeqC[Ctx](a: GrammarNode[Ctx, Char],
+                 b: GrammarNode[Ctx, List[Char]]) = {
+    PMap((x: (Char, List[Char])) => x._1::x._2,
+         Seq(a, b))
+  }
+  def LSeqL[Ctx](a: GrammarNode[Ctx, List[Char]],
+                 b: GrammarNode[Ctx, List[Char]]) = {
+    PMap((x: (List[Char], List[Char])) => x._1 ++ x._2,
+         Seq(a, b))
+  }
+
+  val bracketsAGrammar: GrammarNode[Unit, List[Char]] =
+    Fix(Alt(
+      PMap((x: Char) => List(x), Character('a')),
+      LSeqC(Character('('),
+      LSeqL(Var(IndexZ()),
+      LSeqC(Character(')'),
+           Var(IndexZ()))
+      ))
+    ))
+
+    val dyckLanguage: GrammarNode[Unit, List[Char]] =
+      Fix(Alt(
+        PMap((x: Unit) => List(), Eps()),
+        LSeqL(
+          PMap((x: (List[Char], Char)) => x._1 ++ List(x._2),
+              Seq(
+              LSeqC(Character('('), Var(IndexZ())),
+              Character(')'))
+          ),
+          Var(IndexZ())
+        )
+      ))
+
+    val simpleBrackets: GrammarNode[Unit, List[Char]] =
+      Fix(Alt(
+        PMap((x: Unit) => List(), Eps()),
+        PMap((x: (List[Char], Char)) => x._1 ++ List(x._2),
+              Seq(
+                LSeqC(Character('('), Var(IndexZ())),
+                Character(')')
+              )
+        )
+      ))
+
+    "The E ::= ac | bE grammar" should "unembed to ..." in {
+      // TODO: Being overwhelmed by types!!!!
+      val s: D[Unit, List[Char]] = fix(x => {
+          val ac: D[(List[Char], Unit), (Char, Char)] = 'a' ~ 'c'
+          val left = ac ^^ p2l
+          val right = ('b' ~ x) ^^ cons
+          left <|> right
+      })
+
+      assertResult(g)(getClosedTerm(s))
+    }
+
+    "The simple brackets grammar" should "unembed to ..." in {
+      val s: D[Unit, List[Char]] = fix(x => {
+        (eps ^^ (x => List[Char]())) <|> (((('(' ~ x) ^^ cons) ~ ')') ^^ app)
+      })
+      assertResult(simpleBrackets)(getClosedTerm(s))
+    }
+
+    "The Dyck grammar" should "unembed to ..." in {
+      val s: D[Unit, List[Char]] = fix(x => {
+        val l: D[(List[Char], Unit), List[Char]] =
+          (eps ^^ (x => List[Char]()))
+        val r: D[(List[Char], Unit), List[Char]] =
+          ((((('(' ~ x) ^^ cons) ~ ')') ^^ app) ~ x) ^^ concat
+        l <|> r
+      })
+      assertResult(dyckLanguage)(getClosedTerm(s))
+    }
 }

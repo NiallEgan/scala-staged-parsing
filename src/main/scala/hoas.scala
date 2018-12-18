@@ -27,11 +27,8 @@ trait Hoas extends Env {
   class GrammarNodeOps[Ctx, T](g: D[Ctx, T]) {
     def ~[U](o: D[Ctx, U]): D[Ctx, (T, U)] =
       (con: Context[Ctx]) => Seq(g(con), o(con))
-    def ~(o: Char): D[Ctx, (T, Char)] =
-      (con: Context[Ctx]) => Seq(g(con), Character(o))
     def <|>(o: D[Ctx, T]): D[Ctx, T] =
       (con: Context[Ctx]) => Alt(g(con), o(con))
-
     def ?? : D[Ctx, \/[Unit, T]] = {
       (con: Context[Ctx]) => Alt(
           PMap((x:Unit) => x.left[T], Eps()),
@@ -46,18 +43,13 @@ trait Hoas extends Env {
     //def >>=[U](f: T => GrammarNode[U]
   }
 
-  class GrammarNodeOpsChar[Ctx](g: D[Ctx, Char]) {
-    def <|>(o: Char): D[Ctx, Char] =
-      (con: Context[Ctx]) => Alt(g(con), Character(o))
-  }
-
   implicit def gnToOps[Ctx, T](g: D[Ctx, T]) = new GrammarNodeOps(g)
 
   implicit def charToGNode[Ctx](c: Char): D[Ctx, Char] =
-    (_: Context[Ctx]) => Character(c)
+    (_: Context[Ctx]) => Character[Ctx](c)
 
   implicit def charToGNodeOps[Ctx](c: Char): GrammarNodeOps[Ctx, Char] =
-    new GrammarNodeOps((_: Context[Ctx]) => Character(c))
+    new GrammarNodeOps((_: Context[Ctx]) => Character[Ctx](c))
   // TODO: A string version?
 
   def eps[Ctx]: D[Ctx, Unit] =
