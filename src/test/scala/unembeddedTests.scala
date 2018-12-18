@@ -85,7 +85,7 @@ class AltSpec extends FlatSpec with UnembeddedTester {
   }
 }
 
-class ComplexSpec extends FlatSpec with UnembeddedTester {
+class CompoundSpec extends FlatSpec with UnembeddedTester {
   // TODO: Eps????
   val g: GrammarNode[Unit, (Char, Char)] =
     Seq(Character('a'), Alt(Character('b'), Character('c')))

@@ -12,9 +12,15 @@ case class IndexS[Ctx, A, B](n: DBVar[Ctx, A]) extends DBVar[(B, Ctx), A]
 trait Env {
   type T[_]
 
-  sealed abstract class Context[Ctx]
-  case class CtxZ() extends Context[Unit]
-  case class CtxS[Ctx, A](hd: T[A], tl: Context[Ctx]) extends Context[(A, Ctx)]
+  sealed abstract class Context[Ctx] {
+    val length: Int
+  }
+  case class CtxZ() extends Context[Unit] {
+    override val length = 0
+  }
+  case class CtxS[Ctx, A](hd: T[A], tl: Context[Ctx]) extends Context[(A, Ctx)] {
+    override val length = 1 + tl.length
+  }
 
   def find[Ctx, A](v: DBVar[Ctx, A], env: Context[Ctx]): T[A] = (v, env) match {
     case (IndexZ(), CtxS(x, _)) => x
