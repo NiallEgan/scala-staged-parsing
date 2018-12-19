@@ -3,6 +3,8 @@ package combi
 import scalaz._
 import Scalaz._
 import scala.language.postfixOps
+import scala.language.higherKinds
+
 
 trait Hoas extends Env {
   // TODO: Remove this by changing the type checker and parser to use a
@@ -59,12 +61,15 @@ trait Hoas extends Env {
         f((j: Context[(T, Ctx)]) => Var(tshift(j, CtxS[Ctx, T]((), i))))(CtxS[Ctx, T]((), i))
     )
   }
+}
 
+trait CompilerInstance[R[_]] extends Hoas {
+  this: Parser[R] =>
   def parse[T](g: D[Unit, T], s: String) = {
     val it = Iterator.tabulate(s.length)(i => s(i)).buffered
     val typedGM = TypeChecker.pType(TypeEnv.CtxZ(), g(CtxZ()))
     val r = (for(typedG <- typedGM)
-            yield Parser.parse(typedG, ParserEnv.CtxZ())(it)).join
+            yield makeParser(typedG, ParserEnv.CtxZ())(it)).join
     (r, it)
   }
 }

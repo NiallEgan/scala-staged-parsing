@@ -5,12 +5,12 @@ import Scalaz._
 import org.scalatest.FlatSpec
 
 
-trait UnembeddedTester {
+trait UnembeddedTester extends Parser[Id]{
   def test[T](g: GrammarNode[Unit, T], s: String) = {
     val it = Iterator.tabulate(s.length)(i => s(i)).buffered
     val typedGM = TypeChecker.pType(TypeEnv.CtxZ(), g)
     val r = (for(typedG <- typedGM)
-            yield Parser.parse(typedG, ParserEnv.CtxZ())(it)).join
+            yield makeParser(typedG, ParserEnv.CtxZ())(it)).join
     (r, it)
   }
 }
