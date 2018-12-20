@@ -63,7 +63,7 @@ trait Hoas extends Env {
   }
 }
 
-trait CompilerInstance[R[_]] extends Hoas {
+/*trait CompilerInstance[R[_]] extends Hoas {
   this: Parser[R] =>
   def parse[T](g: D[Unit, T], s: String) = {
     val it = Iterator.tabulate(s.length)(i => s(i)).buffered
@@ -72,4 +72,4 @@ trait CompilerInstance[R[_]] extends Hoas {
             yield makeParser(typedG, ParserEnv.CtxZ())(it)).join
     (r, it)
   }
-}
+}*/

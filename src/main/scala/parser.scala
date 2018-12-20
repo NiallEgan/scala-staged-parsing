@@ -6,12 +6,13 @@ import Scalaz._
 import scala.language.higherKinds
 
 
-
 trait Parser[R[_]] extends TypedParsers[R] {
+  this: OptionOps[R] with BIOps[R] with LiftOps[R] with IfOps[R] with EqOps[R] with SetOps[R] =>
+
   object ParserEnv extends Env {
     override type T[X] = TypedParser[X]
   }
-  
+
   def makeParser[Ctx, T](exp: TypedGrammarNode[Ctx, T], con: ParserEnv.Context[Ctx]): TypedParser[T] = {
     // TODO: This isn't very nice...
     val nullable = exp.tp.nullable
