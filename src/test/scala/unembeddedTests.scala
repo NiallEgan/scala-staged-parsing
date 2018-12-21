@@ -4,8 +4,10 @@ import scalaz._
 import Scalaz._
 import org.scalatest.FlatSpec
 
-
-trait UnembeddedTester extends Parser[Id]{
+trait UnembeddedTester extends UnstagedOptionOps
+                       with UnstagedBIOps with UnstagedLiftOps
+                       with UnstagedEqOps with UnstagedSetOps
+                       with UnstagedIfOps with Parser[Id] {
   def test[T](g: GrammarNode[Unit, T], s: String) = {
     val it = Iterator.tabulate(s.length)(i => s(i)).buffered
     val typedGM = TypeChecker.pType(TypeEnv.CtxZ(), g)

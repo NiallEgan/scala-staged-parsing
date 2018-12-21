@@ -23,7 +23,10 @@ trait UnstagedLiftOps extends LiftOps[Id] {
 
 trait UnstagedIfOps extends IfOps[Id] {
   override implicit def __ifThenElse[T](c: Boolean, thenp: => T, elsep: => T): T =
-    if (c) thenp else elsep
+    c match {
+      case true => thenp
+      case false => elsep
+    }
 }
 
 trait UnstagedEqOps extends EqOps[Id] {
