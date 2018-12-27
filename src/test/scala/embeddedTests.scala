@@ -3,14 +3,16 @@ import combi._
 import scalaz._
 import Scalaz._
 import org.scalatest.FlatSpec
+import lms.{common => lms}
 
 import scala.language.postfixOps
 
-trait EmbeddedTester extends Hoas {
+/*trait EmbeddedTester extends Hoas {
   def getClosedTerm[T](g: D[Unit, T]): GrammarNode[Unit, T] = {
     g(CtxZ())
   }
 }
+
 
 class UnEpsSpec extends FlatSpec with EmbeddedTester {
   "eps" should "be unembedded to Eps()" in {
@@ -24,9 +26,9 @@ class UnCharSpec extends FlatSpec with EmbeddedTester {
   }
 }
 
-class UnSeqSpec extends FlatSpec with EmbeddedTester {
-  val g: GrammarNode[Unit, (Char, Char)] = Seq(Character('a'), Character('b'))
-  "a ~ b" should "be unembedded to get Seq(Character('a'), Character('b'))" in {
+class UnPSeqSpec extends FlatSpec with EmbeddedTester {
+  val g: GrammarNode[Unit, (Char, Char)] = PSeq(Character('a'), Character('b'))
+  "a ~ b" should "be unembedded to get PSeq(Character('a'), Character('b'))" in {
     assertResult(g)(getClosedTerm('a' ~ 'b'))
   }
 }
@@ -40,7 +42,7 @@ class UnAltSpec extends FlatSpec with EmbeddedTester {
 
 class UnCompoundSpec extends FlatSpec with EmbeddedTester {
   val g: GrammarNode[Unit, (Char, Char)] =
-    Seq(Character('a'), Alt(Character('b'), Character('c')))
+    PSeq(Character('a'), Alt(Character('b'), Character('c')))
   "a ~ (b <|> c)" should "be unembedded to get ..." in {
     assertResult(g)(getClosedTerm('a' ~ ('b' <|> 'c')))
   }
@@ -55,9 +57,9 @@ class UnStarSpec extends FlatSpec with EmbeddedTester {
 
 class UnCompound2Spec extends FlatSpec with EmbeddedTester {
   val left: GrammarNode[Unit, (Char, Char)] =
-    Seq(Character('a'), Character('b'))
+    PSeq(Character('a'), Character('b'))
   val right: GrammarNode[Unit, (Char, Char)] =
-    Seq(Character('a'), Character('c'))
+    PSeq(Character('a'), Character('c'))
   val g: GrammarNode[Unit, (Char, Char)] =
      Alt(left, right)
 
@@ -80,29 +82,29 @@ class UnFixSpec extends FlatSpec with EmbeddedTester {
     Fix(Alt(
       PMap(
         p2l,
-        Seq(Character('a'), Character('c'))),
+        PSeq(Character('a'), Character('c'))),
       PMap(
         cons,
-        Seq(Character('b'), Var(IndexZ())))
+        PSeq(Character('b'), Var(IndexZ())))
       ))
 
-  def LSeqC[Ctx](a: GrammarNode[Ctx, Char],
+  def LPSeqC[Ctx](a: GrammarNode[Ctx, Char],
                  b: GrammarNode[Ctx, List[Char]]) = {
     PMap((x: (Char, List[Char])) => x._1::x._2,
-         Seq(a, b))
+         PSeq(a, b))
   }
-  def LSeqL[Ctx](a: GrammarNode[Ctx, List[Char]],
+  def LPSeqL[Ctx](a: GrammarNode[Ctx, List[Char]],
                  b: GrammarNode[Ctx, List[Char]]) = {
     PMap((x: (List[Char], List[Char])) => x._1 ++ x._2,
-         Seq(a, b))
+         PSeq(a, b))
   }
 
   val bracketsAGrammar: GrammarNode[Unit, List[Char]] =
     Fix(Alt(
       PMap((x: Char) => List(x), Character('a')),
-      LSeqC(Character('('),
-      LSeqL(Var(IndexZ()),
-      LSeqC(Character(')'),
+      LPSeqC(Character('('),
+      LPSeqL(Var(IndexZ()),
+      LPSeqC(Character(')'),
            Var(IndexZ()))
       ))
     ))
@@ -110,10 +112,10 @@ class UnFixSpec extends FlatSpec with EmbeddedTester {
     val dyckLanguage: GrammarNode[Unit, List[Char]] =
       Fix(Alt(
         PMap((x: Unit) => List(), Eps()),
-        LSeqL(
+        LPSeqL(
           PMap((x: (List[Char], Char)) => x._1 ++ List(x._2),
-              Seq(
-              LSeqC(Character('('), Var(IndexZ())),
+              PSeq(
+              LPSeqC(Character('('), Var(IndexZ())),
               Character(')'))
           ),
           Var(IndexZ())
@@ -124,8 +126,8 @@ class UnFixSpec extends FlatSpec with EmbeddedTester {
       Fix(Alt(
         PMap((x: Unit) => List(), Eps()),
         PMap((x: (List[Char], Char)) => x._1 ++ List(x._2),
-              Seq(
-                LSeqC(Character('('), Var(IndexZ())),
+              PSeq(
+                LPSeqC(Character('('), Var(IndexZ())),
                 Character(')')
               )
         )
@@ -161,3 +163,4 @@ class UnFixSpec extends FlatSpec with EmbeddedTester {
       assertResult(dyckLanguage)(getClosedTerm(s))
     }
 }
+*/

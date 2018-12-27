@@ -38,7 +38,7 @@ class AltParser[T](isNullable: Boolean, firstSet: Set[Char],
   }
 }
 
-class SeqParser[T, V](isNullable: Boolean, firstSet: Set[Char],
+class PSeqParser[T, V](isNullable: Boolean, firstSet: Set[Char],
                       val parser1: TypedParser[T], val parser2: TypedParser[V])
                       extends TypedParser[(T, V)](isNullable, firstSet) {
   override def apply(it: BufferedIterator[Char]): \/[String, (T, V)] = {
@@ -100,7 +100,7 @@ class MapParser[T, U](isNullable: Boolean, firstSet: Set[Char],
 }
 
 class FixParser[T](isNullable: Boolean, firstSet: Set[Char],
-                   f: BufferedIterator[Char] => \/[String, T]) // Is this right?
+                   f: BufferedIterator[Char] => \/[String, T])
                   extends TypedParser[T](isNullable, firstSet) {
         override def apply(it: BufferedIterator[Char]) = f(it)
 }
