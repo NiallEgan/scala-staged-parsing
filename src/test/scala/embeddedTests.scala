@@ -7,9 +7,9 @@ import lms.{common => lms}
 
 import scala.language.postfixOps
 
-/*trait EmbeddedTester extends Hoas {
+trait EmbeddedTester extends Hoas with GrammarNodes with DslExp {
   def getClosedTerm[T](g: D[Unit, T]): GrammarNode[Unit, T] = {
-    g(CtxZ())
+    g(UnitEnv.CtxZ())
   }
 }
 
@@ -39,6 +39,7 @@ class UnAltSpec extends FlatSpec with EmbeddedTester {
     assertResult(g)(getClosedTerm('a' <|> 'b'))
   }
 }
+
 
 class UnCompoundSpec extends FlatSpec with EmbeddedTester {
   val g: GrammarNode[Unit, (Char, Char)] =
@@ -72,67 +73,68 @@ class UnCompound2Spec extends FlatSpec with EmbeddedTester {
 }
 
 class UnFixSpec extends FlatSpec with EmbeddedTester {
-  def p2l(x: (Char, Char)) = List(x._1, x._2)
-  def cons(x: (Char, List[Char])) = x._1::x._2
-  def app(x: (List[Char], Char)): List[Char] = x._1++List(x._2)
-  def concat(x: (List[Char], List[Char])) = x._1 ++ x._2
+  def p2l(x: Rep[(Char, Char)]): Rep[List[Char]] = List(x._1, x._2)
+  def cons(x: Rep[(Char, List[Char])]): Rep[List[Char]] = x._1::x._2
+  def app(x: Rep[(List[Char], Char)]): Rep[List[Char]] = x._1++List(x._2)
+  def concat(x: Rep[(List[Char], List[Char])]): Rep[List[Char]] = x._1 ++ x._2
 
 
   val g: GrammarNode[Unit, List[Char]] =
     Fix(Alt(
       PMap(
-        p2l,
+        (x: Rep[(Char, Char)]) => List(x._1, x._2),
         PSeq(Character('a'), Character('c'))),
       PMap(
-        cons,
-        PSeq(Character('b'), Var(IndexZ())))
+        (x: Rep[(Char, List[Char])]) => x._1::x._2,
+        PSeq(Character('b'), PVar(IndexZ())))
       ))
 
   def LPSeqC[Ctx](a: GrammarNode[Ctx, Char],
                  b: GrammarNode[Ctx, List[Char]]) = {
-    PMap((x: (Char, List[Char])) => x._1::x._2,
+    PMap((x: Rep[(Char, List[Char])]) => x._1::x._2,
          PSeq(a, b))
   }
+
   def LPSeqL[Ctx](a: GrammarNode[Ctx, List[Char]],
                  b: GrammarNode[Ctx, List[Char]]) = {
-    PMap((x: (List[Char], List[Char])) => x._1 ++ x._2,
+    PMap((x: Rep[(List[Char], List[Char])]) => x._1 ++ x._2,
          PSeq(a, b))
   }
 
   val bracketsAGrammar: GrammarNode[Unit, List[Char]] =
     Fix(Alt(
-      PMap((x: Char) => List(x), Character('a')),
+      PMap((x: Rep[Char]) => List(x), Character('a')),
       LPSeqC(Character('('),
-      LPSeqL(Var(IndexZ()),
+      LPSeqL(PVar(IndexZ()),
       LPSeqC(Character(')'),
-           Var(IndexZ()))
+           PVar(IndexZ()))
       ))
     ))
 
     val dyckLanguage: GrammarNode[Unit, List[Char]] =
       Fix(Alt(
-        PMap((x: Unit) => List(), Eps()),
+        PMap((x: Rep[Unit]) => List(), Eps()),
         LPSeqL(
-          PMap((x: (List[Char], Char)) => x._1 ++ List(x._2),
+          PMap((x: Rep[(List[Char], Char)]) => x._1 ++ List(x._2),
               PSeq(
-              LPSeqC(Character('('), Var(IndexZ())),
+              LPSeqC(Character('('), PVar(IndexZ())),
               Character(')'))
           ),
-          Var(IndexZ())
+          PVar(IndexZ())
         )
       ))
 
     val simpleBrackets: GrammarNode[Unit, List[Char]] =
       Fix(Alt(
-        PMap((x: Unit) => List(), Eps()),
-        PMap((x: (List[Char], Char)) => x._1 ++ List(x._2),
+        PMap((x: Rep[Unit]) => List(), Eps()),
+        PMap((x: Rep[(List[Char], Char)]) => x._1 ++ List(x._2),
               PSeq(
-                LPSeqC(Character('('), Var(IndexZ())),
+                LPSeqC(Character('('), PVar(IndexZ())),
                 Character(')')
               )
         )
       ))
-
+      
     "The E ::= ac | bE grammar" should "unembed to ..." in {
       // TODO: Being overwhelmed by types!!!!
       val s: D[Unit, List[Char]] = fix(x => {
@@ -163,4 +165,3 @@ class UnFixSpec extends FlatSpec with EmbeddedTester {
       assertResult(dyckLanguage)(getClosedTerm(s))
     }
 }
-*/

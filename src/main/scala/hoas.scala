@@ -16,9 +16,9 @@ trait Hoas extends DBVars {
 
   def tshift[A:Typ, I, J](c1: Context[J], c2: Context[(A, I)]): DBVar[J, A] = {
     def tshift_[A:Typ, I, J](n: Int, j: Context[J],
-                         i: Context[(A, I)]): DBVar[J, A] = (j, i) match {
+                             i: Context[(A, I)]): DBVar[J, A] = (j, i) match {
        case (CtxS(_, _), CtxS(_, _)) if n == 0 => {
-         IndexZ().asInstanceOf[DBVar[J, A]] // TODO: Why is this needed?
+         IndexZ().asInstanceOf[DBVar[J, A]] 
        }
        case (CtxS(_, c1), c2) => {
          IndexS (tshift_(n-1, c1, c2))
@@ -45,7 +45,6 @@ trait Hoas extends DBVars {
     def ^^[U:Typ](f: Rep[T] => Rep[U]): D[Ctx, U] =
       (con: Context[Ctx]) => PMap(f, g(con))
 
-    //def >>=[U](f: T => GrammarNode[U]
   }
 
   implicit def gnToOps[Ctx, T:Typ](g: D[Ctx, T]) = new GrammarNodeOps(g)

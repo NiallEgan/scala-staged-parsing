@@ -56,8 +56,16 @@ trait ScalaGenEitherOps extends lms.ScalaGenBase {
   override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
     case EitherLeft(s, rightTyp) => emitValDef(sym, f"${quote(s)}.left[${remap(rightTyp)}]")
     case EitherRight(s, leftTyp) => emitValDef(sym, f"${quote(s)}.right[${remap(leftTyp)}]")
-    case EitherBind(s, f) => emitValDef(sym, src"$s >>= $f")
-    case EitherMap(s, f) => emitValDef(sym, src"$s.map($f)")
+    case EitherBind(s, f) =>
+    emitValDef(sym, src"""$s match {
+      case -\/(s) => -\/(s)
+      case \/-(x) => $f(x)
+    }""")
+    case EitherMap(s, f) =>
+      emitValDef(sym, src"""$s match {
+        case -\/(s) => -\/(s)
+        case \/-(x) => \/-($f(x))
+    }""")
     case _ => super.emitNode(sym, rhs)
   }
 }

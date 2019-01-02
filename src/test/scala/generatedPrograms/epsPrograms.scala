@@ -3,10 +3,11 @@ import Scalaz._
 /*****************************************
   Emitting Generated Code                  
 *******************************************/
-class EpsParser extends ((scala.collection.BufferedIterator[Char])=>(\/[java.lang.String, Unit])) {
-def apply(x0:scala.collection.BufferedIterator[Char]): \/[java.lang.String, Unit] = {
-val x1 = ().right[java.lang.String]
-x1
+class EpsParser extends ((Int, java.lang.String)=>(Tuple2[Int, scalaz.$bslash$div[java.lang.String, Unit]])) {
+def apply(x0:Int, x1:java.lang.String): Tuple2[Int, scalaz.$bslash$div[java.lang.String, Unit]] = {
+val x2 = ().right[java.lang.String]
+val x3 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Unit]](x0,x2)
+x3
 }
 }
 /*****************************************

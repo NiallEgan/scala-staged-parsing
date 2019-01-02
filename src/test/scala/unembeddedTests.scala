@@ -9,13 +9,8 @@ import java.io.PrintWriter
 import java.io.File
 
 trait UnembeddedTester {
-  implicit def sToBufferedIterator(s: String): BufferedIterator[Char] = {
-    Iterator.tabulate(s.length)(i => s(i)).buffered
-  }
-
-  def testGeneratedParsers[T](p: BufferedIterator[Char] => \/[String, T], s: String) = {
-    val it = sToBufferedIterator(s)
-    (p(it), it)
+  def testGeneratedParsers[T](p: (Int, String) => (Int, \/[String, T]), s: String) = {
+    p(0, s)
   }
 }
 
@@ -28,21 +23,14 @@ trait TestCompiler extends ScalaCompile with DslExp
     val IR: self.type = self
   }
 
-  def test[T:Typ](g: GrammarNode[Unit, T], it: BufferedIterator[Char]) = {
-    val typedGM = TypeChecker.pType(TypeEnv.CtxZ(), g)
-    val r = (for(typedG <- typedGM)
-            yield compile(ev(typedG))(typ[BufferedIterator[Char]], typ[\/[String, T]])(it)).join
-    (r, it)
-  }
-
   def printer[T:Typ](g: GrammarNode[Unit, T], className: String, fileName: String) = {
     val typedGM = TypeChecker.pType(TypeEnv.CtxZ(), g)
-    for (typedG <- typedGM) codegen.emitSource(ev(typedG) _, className, new PrintWriter(new File("src/test/scala/generatedPrograms/" + fileName)))
+    for (typedG <- typedGM) codegen.emitSource2(ev(typedG) , className, new PrintWriter(new File("src/test/scala/generatedPrograms/" + fileName)))
     typedGM
   }
 
-  def ev[T:Typ](s: TypedGrammarNode[Unit, T])(it: Rep[BufferedIterator[Char]]): Rep[\/[String, T]] = {
-    parse(s, StagedParserEnv.CtxZ())(typ[T])(it)
+  def ev[T:Typ](g: TypedGrammarNode[Unit, T])(pos: Rep[Int], s: Rep[String]): Rep[(Int, \/[String, T])] = {
+    parse(g, StagedParserEnv.CtxZ())(typ[T])(pos, s)
   }
 }
 
@@ -55,41 +43,44 @@ class EpsSpec extends FlatSpec with UnembeddedTester {
   }
 
   "The eps grammar" should "match the empty string" in {
-    val (r, it) = testGeneratedParsers(p, "")
+    val (pos, r) = testGeneratedParsers(p, "")
     assertResult(().right)(r)
-    assert(!it.hasNext)
+    assert(pos == 0)
   }
 
   "The eps grammar" should "not match a non-empty string" in {
-    val (r, it) = testGeneratedParsers(p, "a")
+    val (pos, r) = testGeneratedParsers(p, "a")
     assertResult(().right)(r)
-    assert(it.hasNext)
+    assert(pos == 0)
   }
 }
+
 
 class CharSpec extends FlatSpec with UnembeddedTester {
   val tester = new TestCompiler with CharTest {
     val f = printer(g, "CharParser", "charPrograms.scala")
   }
+
   val p = new CharParser()
   "The char(a) grammar" should "match the \"a\" string" in {
-    val (r, it) = testGeneratedParsers(p, "a")
+    val (pos, r) = testGeneratedParsers(p, "a")
     assertResult('a'.right)(r)
-    assert(!it.hasNext)
+    assert(pos == 1)
   }
 
   "The char(a) grammar" should "not match the \"b\" string" in {
-    val (r, it) = testGeneratedParsers(p, "b")
+    val (pos, r) = testGeneratedParsers(p, "b")
     assertResult(-\/("Error: Expected a, got b."))(r)
-    assert(it.hasNext)
+    assert(pos == 0)
   }
 
   "The char(a) grammar" should "not match the \"\" string" in {
-    val (r, it) = testGeneratedParsers(p, "")
+    val (pos, r) = testGeneratedParsers(p, "")
     assertResult(-\/("Error: Expected a, but reached end of input."))(r)
-    assert(!it.hasNext)
+    assert(pos == 0)
   }
 }
+
 
 class PSeqSpec extends FlatSpec with UnembeddedTester {
   val tester = new TestCompiler with PSeqTest {
@@ -99,17 +90,18 @@ class PSeqSpec extends FlatSpec with UnembeddedTester {
   val p = new SeqParser()
 
   "The seq(ab) grammar" should "match the \"ab\" string" in {
-    val (r, it) = testGeneratedParsers(p,  "ab")
+    val (pos, r) = testGeneratedParsers(p,  "ab")
     assertResult(('a', 'b').right)(r)
-    assert(!it.hasNext)
+    assert(pos == 2)
   }
 
   "The seq(ab) grammar" should "not match the \"a\" string" in {
-    val (r, it) = testGeneratedParsers(p, "a")
+    val (pos, r) = testGeneratedParsers(p, "a")
     assertResult(-\/("Error: Expected b, but reached end of input."))(r)
-    assert(!it.hasNext)
+    assert(pos == 1)
   }
 }
+
 
 class AltSpec extends FlatSpec with UnembeddedTester {
   val tester = new TestCompiler with AltTest {
@@ -118,23 +110,24 @@ class AltSpec extends FlatSpec with UnembeddedTester {
   val p = new AltParser()
 
   "The a|b grammar" should "match the \"a\" string" in {
-    val (r, it) = testGeneratedParsers(p,  "a")
+    val (pos, r) = testGeneratedParsers(p,  "a")
     assertResult('a'.right)(r)
-    assert(!it.hasNext)
+    assert(pos == 1)
   }
 
   "The a|b grammar" should "match the \"b\" string" in {
-    val (r, it) = testGeneratedParsers(p,  "b")
+    val (pos, r) = testGeneratedParsers(p,  "b")
     assertResult('b'.right)(r)
-    assert(!it.hasNext)
+    assert(pos == 1)
   }
 
   "The a|b grammar" should "not match the \"c\" string" in {
-    val (r, it) = testGeneratedParsers(p,  "c")
+    val (pos, r) = testGeneratedParsers(p,  "c")
     assertResult(-\/("Error: Token c matches neither possible branch."))(r)
-    assert(it.hasNext)
+    assert(pos == 0)
   }
 }
+
 
 class CompoundSpec extends FlatSpec with UnembeddedTester {
   val tester = new TestCompiler with CompoundTest {
@@ -144,23 +137,24 @@ class CompoundSpec extends FlatSpec with UnembeddedTester {
   val p = new CompoundParser()
 
   "The a(b|c) grammar" should "match the ab string" in {
-    val (r, it) = testGeneratedParsers(p,  "ab")
+    val (pos, r) = testGeneratedParsers(p,  "ab")
     assertResult(('a', 'b').right)(r)
-    assert(!it.hasNext)
+    assert(pos == 2)
   }
 
   "The a(b|c) grammar" should "match the ac string" in {
-    val (r, it) = testGeneratedParsers(p,  "ac")
+    val (pos, r) = testGeneratedParsers(p,  "ac")
     assertResult(('a', 'c').right)(r)
-    assert(!it.hasNext)
+    assert(pos == 2)
   }
 
   "The a(b|c) grammar" should "not match the ad string" in {
-    val (r, it) = testGeneratedParsers(p,  "ad")
+    val (pos, r) = testGeneratedParsers(p,  "ad")
     assertResult(-\/("Error: Token d matches neither possible branch."))(r)
-    assert(it.hasNext)
+    assert(pos == 1)
   }
 }
+
 
 class StarSpec extends FlatSpec with UnembeddedTester {
   val tester = new TestCompiler with StarTest {
@@ -170,21 +164,21 @@ class StarSpec extends FlatSpec with UnembeddedTester {
   val p = new StarParser()
 
   "The a* grammar" should "match the aaa string" in {
-    val (r, it) = testGeneratedParsers(p,  "aaa")
+    val (pos, r) = testGeneratedParsers(p,  "aaa")
     assertResult(List('a', 'a', 'a').right)(r)
-    assert(!it.hasNext)
+    assert(pos == 3)
   }
 
   "The a* grammar" should "match the \"\"" in {
-    val (r, it) = testGeneratedParsers(p,  "")
+    val (pos, r) = testGeneratedParsers(p,  "")
     assertResult(List().right)(r)
-    assert(!it.hasNext)
+    assert(pos == 0)
   }
 
   "The a* grammar" should "not match the b string" in {
-    val (r, it) = testGeneratedParsers(p,  "b")
+    val (pos, r) = testGeneratedParsers(p,  "b")
     assertResult(List().right)(r)
-    assert(it.hasNext)
+    assert(pos == 0)
   }
 }
 
@@ -213,83 +207,83 @@ class FixSpec extends FlatSpec with UnembeddedTester {
   val dyckParser = new DyckParser()
 
   "The E ::= ac | bE grammar" should "match bbac" in {
-    val (r, it) = testGeneratedParsers(p, "bbac")
+    val (pos, r) = testGeneratedParsers(p, "bbac")
     assertResult(List('b', 'b', 'a', 'c').right)(r)
-    assert(!it.hasNext)
+    assert(pos == 4)
   }
 
   "The E ::= ac | bE grammar" should "match ac" in {
-    val (r, it) = testGeneratedParsers(p, "ac")
+    val (pos, r) = testGeneratedParsers(p, "ac")
     assertResult(List('a', 'c').right)(r)
-    assert(!it.hasNext)
+    assert(pos == 2)
   }
 
   "The E ::= ac | bE grammar" should "not match ab" in {
-    val (r, it) = testGeneratedParsers(p, "ab")
+    val (pos, r) = testGeneratedParsers(p, "ab")
     assertResult(-\/("Error: Expected c, got b."))(r)
-    assert(it.hasNext)
+    assert(pos == 1)
   }
 
   "The a-brackets grammar" should "match (a)" in {
     val s: String = "(a)a"
-    val (r, it) = testGeneratedParsers(bracketsA, s)
-    assertResult(augmentString(s).toList.right)(r)
-    assert(!it.hasNext)
+    val (pos, r) = testGeneratedParsers(bracketsA, s)
+    assertResult(s.toList.right)(r)
+    assert(pos == 4)
   }
 
   "The a-brackets grammar" should "match ((a)a)a(a)a((a)a)a" in {
     val s: String = "((a)a)(a)((a)a)a"
-    val (r, it) = testGeneratedParsers(bracketsA, s)
-    assertResult(augmentString(s).toList.right)(r)
-    assert(!it.hasNext)
+    val (pos, r) = testGeneratedParsers(bracketsA, s)
+    assertResult(s.toList.right)(r)
+    assert(pos == s.length)
   }
 
   "The brackets grammar" should "match ((()))" in {
     val s: String = "((()))"
-    val (r, it) = testGeneratedParsers(simpleBrackets, s)
-    assertResult(augmentString(s).toList.right)(r)
-    assert(!it.hasNext)
+    val (pos, r) = testGeneratedParsers(simpleBrackets, s)
+    assertResult(s.toList.right)(r)
+    assert(pos == s.length)
   }
 
   "The brackets grammar" should "match (())" in {
     val s: String = "(())"
-    val (r, it) = testGeneratedParsers(simpleBrackets, s)
-    assertResult(augmentString(s).toList.right)(r)
-    assert(!it.hasNext)
+    val (pos, r) = testGeneratedParsers(simpleBrackets, s)
+    assertResult(s.toList.right)(r)
+    assert(pos == s.length)
   }
 
   "The brackets grammar" should "not match ((())" in {
     val s: String = "((())"
-    val (r, it) = testGeneratedParsers(simpleBrackets, s)
+    val (pos, r) = testGeneratedParsers(simpleBrackets, s)
     assertResult(-\/("Error: Expected ), but reached end of input."))(r)
-    assert(!it.hasNext)
+    assert(pos == s.length)
   }
 
   "The Dyck grammar" should "match ((()))" in {
     val s: String = "((()))"
-    val (r, it) = testGeneratedParsers(dyckParser, s)
+    val (pos, r) = testGeneratedParsers(dyckParser, s)
     assertResult(augmentString(s).toList.right)(r)
-    assert(!it.hasNext)
+    assert(pos == s.length)
   }
 
   "The Dyck grammar" should "match (()())()()((()())())()" in {
     val s: String = "(()())()()((()())())()"
-    val (r, it) = testGeneratedParsers(dyckParser, s)
+    val (pos, r) = testGeneratedParsers(dyckParser, s)
     assertResult(augmentString(s).toList.right)(r)
-    assert(!it.hasNext)
+    assert(pos == s.length)
   }
 
   "The Dyck grammar" should "not match (()()))" in {
     val s: String = "(()()))"
-    val (r, it) = testGeneratedParsers(dyckParser, s)
+    val (pos, r) = testGeneratedParsers(dyckParser, s)
     assertResult(augmentString("(()())").toList.right)(r)
-    assert(it.hasNext)
+    assert(pos == 6)
   }
 
   "The Dyck grammar" should "not match (()())(()" in {
     val s: String = "(()())(()"
-    val (r, it) = testGeneratedParsers(dyckParser, s)
+    val (pos, r) = testGeneratedParsers(dyckParser, s)
     assertResult(-\/("Error: Expected ), but reached end of input."))(r)
-    assert(!it.hasNext)
+    assert(pos == s.length)
   }
 }

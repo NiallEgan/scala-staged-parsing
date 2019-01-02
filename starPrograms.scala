@@ -11,33 +11,31 @@ val x4 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.i
 var x5: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]] = x4
 val x9 = x1.length
 val x29 = "Error: Expected a, but reached end of input.".left[Char]
-val x47 = {(x32:Int,x33:Char) => 
+val x48 = {(x32:Int,x33:Char) => 
 val x36 = x5
 val x34 = x32
 val x35 = x33
-val x44 = {(x37:Int,x38:scala.collection.immutable.List[Char]) => 
+val x45 = {(x37:Int,x38:scala.collection.immutable.List[Char]) => 
+val x39 = x37
+val x42 = x34 + x39
 val x40 = x38
 val x41 = x35 :: x40
-val x42 = x41.right[java.lang.String]
-val x43 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]](x34,x42)
-x43: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
+val x43 = x41.right[java.lang.String]
+val x44 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]](x42,x43)
+x44: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
 }
-val x45 = x36._2 match {
+val x46 = x36._2 match {
         case -\/(s) => (x36._1, -\/(s))
-        case \/-(t) => x44(x36._1, t)
+        case \/-(t) => x45(x36._1, t)
       }
-x45: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
+x46: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
 }
-val x51 = while ({val x6 = x5
+val x52 = while ({val x6 = x5
 val x7 = x6._1
 val x10 = x7 < x9
-val x13 = if (x10) {
 val x11 = x1.charAt(x7)
 val x12 = 'a' == x11
-x12
-} else {
-false
-}
+val x13 = x10 && x12
 x13}) {
 val x15 = x5
 val x16 = x15._1
@@ -62,15 +60,15 @@ x28
 val x30 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x16,x29)
 x30
 }
-val x48 = x31._2 match {
+val x49 = x31._2 match {
         case -\/(s) => (x31._1, -\/(s))
-        case \/-(t) => x47(x31._1, t)
+        case \/-(t) => x48(x31._1, t)
       }
-x5 = x48
+x5 = x49
 ()
 }
-val x52 = x5
-x52
+val x53 = x5
+x53
 }
 }
 /*****************************************

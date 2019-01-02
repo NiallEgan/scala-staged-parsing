@@ -4,19 +4,16 @@ import scala.collection.BufferedIterator
 import language.postfixOps
 import scalaz._
 import Scalaz._
-// TODO: Generalize return type
 
-sealed abstract class TypedParser[T](val isNullable: Boolean, val firstSet: Set[Char]) {
+sealed abstract class TypedParser[T](val isNullable: Boolean,  firstSet: Set[Char])
+    extends (BufferedIterator[Char] => \/[String, T]) {
   def hasInFirstSet(c: Char): Boolean =
     firstSet.contains(c)
 
   def apply(it: BufferedIterator[Char]): \/[String, T] // \/ = Either
 
-  def err(s: String): \/[String, T] =
-    s.left[T]
-
-  def suc(r: T): \/[String, T] = // TODO: This is just unit
-    r.right[String]
+  def err(s: String): \/[String, T] = s.left[T]
+  def suc(r: T): \/[String, T] = r.right[String]
 }
 
 class AltParser[T](isNullable: Boolean, firstSet: Set[Char],

@@ -3,95 +3,118 @@ import Scalaz._
 /*****************************************
   Emitting Generated Code                  
 *******************************************/
-class CompoundParser extends ((scala.collection.BufferedIterator[Char])=>(\/[java.lang.String, Tuple2[Char, Char]])) {
-def apply(x0:scala.collection.BufferedIterator[Char]): \/[java.lang.String, Tuple2[Char, Char]] = {
-val x1 = x0.hasNext
-val x13 = if (x1) {
-val x2 = x0.head
-val x3 = x2 == 'a'
-val x10 = if (x3) {
-val x4 = x0.next()
-val x5 = x4.right[java.lang.String]
-x5
+class CompoundParser extends ((Int, java.lang.String)=>(Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, Char]]])) {
+def apply(x0:Int, x1:java.lang.String): Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, Char]]] = {
+val x2 = x1.length
+val x3 = x0 < x2
+val x16 = if (x3) {
+val x4 = x1.charAt(x0)
+val x5 = x4 == 'a'
+val x13 = if (x5) {
+val x6 = x0 + 1
+val x7 = x4.right[java.lang.String]
+val x8 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x6,x7)
+x8
 } else {
-val x7 = "Error: Expected a, got "+x2
-val x8 = x7+"."
-val x9 = x8.left[Char]
-x9
-}
-x10
-} else {
-val x12 = "Error: Expected a, but reached end of input.".left[Char]
+val x9 = "Error: Expected a, got "+x4
+val x10 = x9+"."
+val x11 = x10.left[Char]
+val x12 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x0,x11)
 x12
 }
-val x27 = "Error: Expected b, but reached end of input.".left[Char]
-val x40 = "Error: Expected c, but reached end of input.".left[Char]
-val x50 = "Error: End of input encountered, but both branches still expecting input.".left[Char]
-val x58 = {x14: (Char) => 
-val x15 = x0.hasNext
-val x51 = if (x15) {
-val x16 = x0.head
-val x17 = 'b' == x16
-val x48 = if (x17) {
-val x28 = if (x15) {
-val x18 = x16 == 'b'
-val x25 = if (x18) {
-val x19 = x0.next()
-val x20 = x19.right[java.lang.String]
-x20
+x13
 } else {
-val x22 = "Error: Expected b, got "+x16
-val x23 = x22+"."
-val x24 = x23.left[Char]
-x24
+val x14 = "Error: Expected a, but reached end of input.".left[Char]
+val x15 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x0,x14)
+x15
 }
-x25
-} else {
+val x33 = "Error: Expected b, but reached end of input.".left[Char]
+val x43 = "Error: Expected c, but reached end of input.".left[Char]
+val x52 = "Error: End of input encountered, but both branches still expecting input.".left[Char]
+val x64 = {(x17:Int,x18:Char) => 
+val x19 = x17
+val x21 = x19 < x2
+val x54 = if (x21) {
+val x22 = x1.charAt(x19)
+val x23 = 'b' == x22
+val x51 = if (x23) {
+val x35 = if (x21) {
+val x24 = x22 == 'b'
+val x32 = if (x24) {
+val x25 = x19 + 1
+val x26 = x22.right[java.lang.String]
+val x27 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x25,x26)
 x27
-}
-x28
 } else {
-val x30 = 'c' == x16
-val x46 = if (x30) {
-val x41 = if (x15) {
-val x31 = x16 == 'c'
-val x38 = if (x31) {
-val x32 = x0.next()
-val x33 = x32.right[java.lang.String]
-x33
-} else {
-val x35 = "Error: Expected c, got "+x16
-val x36 = x35+"."
-val x37 = x36.left[Char]
-x37
+val x28 = "Error: Expected b, got "+x22
+val x29 = x28+"."
+val x30 = x29.left[Char]
+val x31 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x19,x30)
+x31
 }
-x38
+x32
 } else {
-x40
+val x34 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x19,x33)
+x34
 }
+x35
+} else {
+val x36 = 'c' == x22
+val x50 = if (x36) {
+val x45 = if (x21) {
+val x37 = x22 == 'c'
+val x42 = if (x37) {
+val x25 = x19 + 1
+val x26 = x22.right[java.lang.String]
+val x27 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x25,x26)
+x27
+} else {
+val x38 = "Error: Expected c, got "+x22
+val x39 = x38+"."
+val x40 = x39.left[Char]
+val x41 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x19,x40)
 x41
+}
+x42
 } else {
-val x43 = "Error: Token "+x16
-val x44 = x43+" matches neither possible branch."
-val x45 = x44.left[Char]
+val x44 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x19,x43)
+x44
+}
 x45
-}
-x46
-}
-x48
 } else {
+val x46 = "Error: Token "+x22
+val x47 = x46+" matches neither possible branch."
+val x48 = x47.left[Char]
+val x49 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x19,x48)
+x49
+}
 x50
 }
-val x55 = {x52: (Char) => 
-val x53 = new Tuple2[Char, Char](x14,x52)
-val x54 = x53.right[java.lang.String]
-x54: \/[java.lang.String, Tuple2[Char, Char]]
+x51
+} else {
+val x53 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x19,x52)
+x53
 }
-val x56 = x51 >>= x55
-x56: \/[java.lang.String, Tuple2[Char, Char]]
+val x20 = x18
+val x62 = {(x55:Int,x56:Char) => 
+val x57 = x55
+val x58 = x56
+val x59 = new Tuple2[Char, Char](x20,x58)
+val x60 = x59.right[java.lang.String]
+val x61 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, Char]]](x57,x60)
+x61: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, Char]]]
 }
-val x59 = x13 >>= x58
-x59
+val x63 = x54._2 match {
+        case -\/(s) => (x54._1, -\/(s))
+        case \/-(t) => x62(x54._1, t)
+      }
+x63: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, Char]]]
+}
+val x65 = x16._2 match {
+        case -\/(s) => (x16._1, -\/(s))
+        case \/-(t) => x64(x16._1, t)
+      }
+x65
 }
 }
 /*****************************************

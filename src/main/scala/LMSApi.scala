@@ -5,14 +5,20 @@ import scalaz._
 import Scalaz._
 import java.io.PrintWriter
 
+trait ExtendedStringOps extends lms.StringOps {
+  implicit class SOps(s: Rep[String]) {
+    def length(): Rep[Int] = string_length(s)
+  }
+}
 
 trait LMSDriver extends lms.PrimitiveOps with lms.BooleanOps
                 with lms.Equal with EitherOps
-                with lms.StringOps with lms.IfThenElse
-                with BufferedIteratorOps with lms.TupleOps
+                with ExtendedStringOps with lms.IfThenElse
+                with lms.TupleOps
                 with lms.ListOps with lms.Functions
                 with lms.Variables with lms.While
-                with lms.ExceptionOps {
+                with lms.ExceptionOps with lms.OrderingOps
+                with ExtendedPairOps {
   implicit def nothingTyp: Typ[Nothing]
 
   def doLambdaMut[A:Typ, B:Typ](fun: Rep[A] => Rep[B]): Rep[A => B]
@@ -21,11 +27,12 @@ trait LMSDriver extends lms.PrimitiveOps with lms.BooleanOps
 trait DslExp extends LMSDriver with lms.PrimitiveOpsExp with lms.BooleanOpsExpOpt
              with lms.EqualExp with EitherOpsExp
              with lms.StringOpsExp with lms.IfThenElseExpOpt
-             with BufferedIteratorOpsExp with lms.TupleOpsExp
-             with lms.ListOpsExpOpt with lms.FunctionsExp
+             with lms.TupleOpsExp
+             with lms.ListOpsExpOpt with lms.TupledFunctionsExp
              with lms.ArrayOpsExpOpt with lms.SeqOpsExp
              with lms.VariablesExp with lms.WhileExp
-             with lms.ExceptionOpsExp {
+             with lms.ExceptionOpsExp with lms.OrderingOpsExp
+             with ExtendedPairOpsExp {
   implicit def nothingTyp: Typ[Nothing] = manifestTyp
 
   override def doLambdaMut[A:Typ, B:Typ](fun: Exp[A] => Exp[B]): Exp[A => B] = {
@@ -48,21 +55,28 @@ trait DslGenScala extends lms.ScalaGenPrimitiveOps
                   with lms.ScalaGenIfThenElse
                   with lms.ScalaGenTupleOps
                   with lms.ScalaGenListOps
-                  with ScalaGenBufferedIteratorOps
                   with ScalaGenEitherOps
-                  with lms.ScalaGenFunctions
+                  with lms.ScalaGenTupledFunctions
                   with lms.ScalaGenArrayOps
                   with lms.ScalaGenSeqOps
                   with lms.ScalaGenVariables
                   with lms.ScalaGenWhile
-                  with lms.ScalaGenExceptionOps {
+                  with lms.ScalaGenExceptionOps
+                  with lms.ScalaGenOrderingOps
+                  with ScalaGenExtenedPairOps {
     val IR: DslExp
     import IR._
 
 
+    override def emitSource2[T1:Typ, T2:Typ, R:Typ](f: (Exp[T1], Exp[T2]) => Exp[R],
+      className: String, stream: PrintWriter): List[(Sym[Any], Any)] = {
+        stream.println("import scalaz._")
+        stream.println("import Scalaz._")
+        super.emitSource2(f, className, stream)
+      }
     override def emitSource[T:Typ, R:Typ](f: Exp[T] => Exp[R],
         className: String, stream: PrintWriter): List[(Sym[Any], Any)] = {
-      // This marks the second argument as mutable
+      // This marks the second argument as mutable (was used with buffered iterators)
       stream.println("import scalaz._")
       stream.println("import Scalaz._")
       val s1 = reflectMutableSym(fresh[T])
