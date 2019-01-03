@@ -111,7 +111,6 @@ trait TypeChecker {
             )
 
           val iterTypes = Stream.iterate(bottomType.right[String])(nextType)
-          println("Finding type")
           val m = fix_s(iterTypes.tail, iterTypes.head)
 
           m >>= ((t: TypeEnv.T[A]) =>

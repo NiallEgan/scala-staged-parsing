@@ -16,7 +16,8 @@ trait StagedCombinators extends LMSDriver with TypedGrammarNodes
   def suc[T:Typ](r: Rep[T], i: Rep[Int]): Rep[(Int, \/[String, T])] = (i, right[String, T](r))
 
   sealed abstract class StagedParser[T:Typ](val isNullable: Boolean,
-                                        val firstSet: Set[Char]) {
+                                            val firstSet: Set[Char])
+      extends ((Rep[Int], Rep[String]) => Rep[(Int, \/[String, T])]) {
     def hasInFirstSet(c: Rep[Char]): Rep[Boolean] = {
       def f(b: Rep[Boolean], o: Char) = __equal[Char, Char](unit(o), c) || b
       firstSet.foldLeft(unit(false))(f)
@@ -82,7 +83,6 @@ trait StagedCombinators extends LMSDriver with TypedGrammarNodes
                      extends StagedParser[List[T]](isNullable, firstSet) {
     override def apply(pos: Rep[Int], s: Rep[String]): Rep[(Int, \/[String, List[T]])] = {
       val result = var_new(suc(List[T](), pos))
-      // TODO: Move back to and?
       while (if(readVar(result)._1 < s.length) parser1.hasInFirstSet(s charAt readVar(result)._1) else unit(false)) {
         result = parser1(readVar(result)._1, s) >> ((i: Rep[Int], x: Rep[T]) =>
                  readVar(result) >> ((_: Rep[Int], xs: Rep[List[T]]) => suc(x::xs, i)))
@@ -112,7 +112,6 @@ trait StagedCombinators extends LMSDriver with TypedGrammarNodes
   }
 
   def parse[Ctx, T:Typ](exp: TypedGrammarNode[Ctx, T], con: StagedParserEnv.Context[Ctx]): StagedParser[T] = {
-    // TODO: This isn't very nice...
     val nullable = exp.tp.nullable
     val firstSet = exp.tp.first
     exp match {

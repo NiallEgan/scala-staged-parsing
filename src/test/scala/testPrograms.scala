@@ -39,6 +39,11 @@ trait CompoundTest2 extends GrammarNodes with LMSDriver {
      Alt(left, right)
 }
 
+trait CompoundTest3 extends GrammarNodes with LMSDriver {
+  val g: GrammarNode[Unit, List[(Char, Char)]] =
+    Star(PSeq(Character('a'), Character('b')))
+}
+
 trait AmbigousTests extends GrammarNodes with LMSDriver {
   // TODO: More examples of ambigous grammars
   val left: GrammarNode[Unit, (Char, Char)] =
