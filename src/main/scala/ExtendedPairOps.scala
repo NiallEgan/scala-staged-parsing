@@ -3,6 +3,7 @@ package combi
 import scalaz._
 import Scalaz._
 import lms.{common => lms}
+import scala.collection.mutable.HashMap
 
 
 trait ExtendedPairOps extends lms.TupleOps with EitherOps
@@ -10,6 +11,8 @@ trait ExtendedPairOps extends lms.TupleOps with EitherOps
   def combine[T:Typ, U:Typ](x: Rep[(Int, \/[String, T])],
                      f: Rep[((Int, T)) => (Int, \/[String, U])]):
                      Rep[(Int, \/[String, U])]
+  // TODO: Why does private cause the program to crash...
+  val seenFuncs = new HashMap[Any, Any]()
 
   implicit class CombineOps[T:Typ](x: Rep[(Int, \/[String, T])]) {
     def >>[U:Typ](f: Rep[((Int, T)) => (Int, \/[String, U])]) = {
@@ -17,15 +20,20 @@ trait ExtendedPairOps extends lms.TupleOps with EitherOps
     }
 
     def >>[U:Typ](f: (Rep[Int], Rep[T]) => Rep[(Int, \/[String, U])]) = {
-      combine[T, U](x, fun(f))
+      if (seenFuncs.contains(f)) {
+        val liftedF = seenFuncs(f).asInstanceOf[Rep[((Int, T)) => (Int, \/[String, U])]]
+        combine[T, U](x, liftedF)
+      } else {
+        val liftedF = fun(f)
+        seenFuncs += f -> liftedF
+        combine[T, U](x, liftedF)
+      }
     }
   }
-
-  //implicit def foo[T:Typ](x: Rep[(Int, \/[String, T])]) = new CombineOps(x)
 }
 
 trait ExtendedPairOpsExp extends ExtendedPairOps with lms.BaseExp
-                         with lms.TupleOpsExp with EitherOpsExp {
+                         with lms.TupleOpsExp with EitherOpsExpOpt {
   case class Combine[T:Typ, U:Typ](x: Exp[(Int, \/[String, T])],
                      f: Exp[((Int, T)) => (Int, \/[String, U])]) extends Def[(Int, \/[String, U])]
 
@@ -33,6 +41,24 @@ trait ExtendedPairOpsExp extends ExtendedPairOps with lms.BaseExp
                      f: Exp[((Int, T)) => (Int, \/[String, U])]):
                      Exp[(Int, \/[String, U])] = {
       Combine(x, f)
+  }
+}
+
+trait ExtendedPairOpsExpOpt extends ExtendedPairOpsExp {
+  override def combine[T: Typ, U: Typ](x: Exp[(Int, \/[String, T])],
+                                       f: Exp[((Int, T)) => (Int, \/[String, U])]) = {
+      (x, f) match {
+        case (Def(SimpleStruct(_,
+              Seq(("._1", n:Exp[Int]), ("._2", Def(EitherLeft(s:Exp[String], r)))))),
+              Def(Lambda(f, _, _))) => make_tuple2((n, EitherLeft(s, typ[U])))
+        case (Def(SimpleStruct(_,
+              Seq(("._1", n:Exp[Int]), ("._2", Def(EitherRight(s:Exp[T], r)))))),
+              Def(Lambda(f, _, _))) => f(n, s)
+        case (_, _) => {
+          //println(x)
+          super.combine(x, f)
+        }
+      }
   }
 }
 

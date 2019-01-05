@@ -15,7 +15,7 @@ trait LMSDriver extends lms.PrimitiveOps with lms.BooleanOps
                 with lms.Equal with EitherOps
                 with ExtendedStringOps with lms.IfThenElse
                 with lms.TupleOps
-                with lms.ListOps with lms.Functions
+                with lms.ListOps with lms.TupledFunctions
                 with lms.Variables with lms.While
                 with lms.ExceptionOps with lms.OrderingOps
                 with ExtendedPairOps {
@@ -32,7 +32,7 @@ trait DslExp extends LMSDriver with lms.PrimitiveOpsExp with lms.BooleanOpsExpOp
              with lms.ArrayOpsExpOpt with lms.SeqOpsExp
              with lms.VariablesExp with lms.WhileExp
              with lms.ExceptionOpsExp with lms.OrderingOpsExp
-             with ExtendedPairOpsExp {
+             with ExtendedPairOpsExpOpt {
   implicit def nothingTyp: Typ[Nothing] = manifestTyp
 
   override def doLambdaMut[A:Typ, B:Typ](fun: Exp[A] => Exp[B]): Exp[A => B] = {

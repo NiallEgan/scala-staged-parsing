@@ -25,6 +25,14 @@ trait CompoundTest extends GrammarNodes with LMSDriver {
     PSeq(Character('a'), Alt(Character('b'), Character('c')))
 }
 
+trait ExpansionTest extends GrammarNodes with LMSDriver {
+  val g: GrammarNode[Unit, (Char, Char)] =
+    Alt(PSeq(Character('a'), Character('b')),
+        PMap((n: Rep[Char]) => (n, n),
+             Character('c'))
+      )
+}
+
 trait StarTest extends GrammarNodes with LMSDriver {
   val g: GrammarNode[Unit, List[Char]] =
     Star(Character('a'))
@@ -52,6 +60,18 @@ trait AmbigousTests extends GrammarNodes with LMSDriver {
     PSeq(Character('a'), Character('c'))
   val g: GrammarNode[Unit, (Char, Char)] =
      Alt(left, right)
+}
+
+trait SimpleFixExample extends GrammarNodes with LMSDriver {
+  val g: GrammarNode[Unit, List[Char]] =
+    Fix(
+      Alt(
+        PMap((x: Rep[Unit]) => List(), Eps()),
+        PMap((x: Rep[(Char, List[Char])]) => x._1::x._2,
+          PSeq(Character('a'), PVar(IndexZ()))
+        )
+      )
+    )
 }
 
 trait FixTests extends GrammarNodes with LMSDriver {

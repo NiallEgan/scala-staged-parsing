@@ -128,6 +128,26 @@ class AltSpec extends FlatSpec with UnembeddedTester {
   }
 }
 
+class ExampleSpec extends FlatSpec with UnembeddedTester {
+  val tester = new TestCompiler with SimpleFixExample {
+    val f = printer(g, "ExampleParser", "example.scala")
+  }
+
+  val p = new ExampleParser()
+
+  "The E ::= | aE grammar" should "match aaaa" in {
+    val (pos, r) = testGeneratedParsers(p, "aaaa")
+    assertResult(List('a', 'a', 'a', 'a').right)(r)
+    assert(pos == 4)
+  }
+
+  "The E ::= | aE grammar" should "not match aaaba" in {
+    val (pos, r) = testGeneratedParsers(p, "aaaba")
+    assertResult(List('a', 'a', 'a').right)(r)
+    assert(pos == 3)
+  }
+
+}
 
 class CompoundSpec extends FlatSpec with UnembeddedTester {
   val tester = new TestCompiler with CompoundTest {
@@ -151,6 +171,20 @@ class CompoundSpec extends FlatSpec with UnembeddedTester {
   "The a(b|c) grammar" should "not match the ad string" in {
     val (pos, r) = testGeneratedParsers(p,  "ad")
     assertResult(-\/("Error: Token d matches neither possible branch."))(r)
+    assert(pos == 1)
+  }
+}
+
+class ExpansionSpec extends FlatSpec with UnembeddedTester {
+  val tester = new TestCompiler with CompoundTest {
+    val f = printer(g, "ExpansionParser", "expansion.scala")
+  }
+
+  val p = new ExpansionParser()
+
+  "The ab | c grammar" should "not match the ac string" in {
+    val (pos, r) = testGeneratedParsers(p, "ac")
+    assertResult(-\/("Error: Expected b, got c"))(r)
     assert(pos == 1)
   }
 }

@@ -3,7 +3,7 @@ import Scalaz._
 /*****************************************
   Emitting Generated Code                  
 *******************************************/
-class CompoundParser extends ((Int, java.lang.String)=>(Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, Char]]])) {
+class ExpansionParser extends ((Int, java.lang.String)=>(Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, Char]]])) {
 def apply(x0:Int, x1:java.lang.String): Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, Char]]] = {
 val x42 = x1.length
 val x43 = x0 < x42

@@ -42,6 +42,17 @@ trait EitherOpsExp extends EitherOps with lms.BaseExp with lms.StringOpsExp {
     EitherMap(o, f)
 }
 
+trait EitherOpsExpOpt extends EitherOpsExp with lms.FunctionsExp {
+  override def either_bind[L: Typ, R:Typ, B:Typ](o: Exp[\/[L, R]],
+                                                 f: Exp[R => \/[L, B]]) = {
+      (o, f) match {
+        case (Def(EitherLeft(s, rightTyp)), _) => EitherLeft(s, typ[B])(typ[L], typ[B])
+        case (Def(EitherRight(s, leftTyp)), Def(Lambda(f, _, _))) => f(s)
+        case (_, _) => super.either_bind(o, f)
+      }
+  }
+}
+
 trait ScalaGenEitherOps extends lms.ScalaGenBase {
   val IR: EitherOpsExp
   import IR._
