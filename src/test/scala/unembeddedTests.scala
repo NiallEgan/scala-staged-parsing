@@ -133,7 +133,7 @@ class ExampleSpec extends FlatSpec with UnembeddedTester {
     val f = printer(g, "ExampleParser", "example.scala")
   }
 
-  val p = new ExampleParser()
+  val p = new ExampleParser2()
 
   "The E ::= | aE grammar" should "match aaaa" in {
     val (pos, r) = testGeneratedParsers(p, "aaaa")
@@ -176,7 +176,7 @@ class CompoundSpec extends FlatSpec with UnembeddedTester {
 }
 
 class ExpansionSpec extends FlatSpec with UnembeddedTester {
-  val tester = new TestCompiler with CompoundTest {
+  val tester = new TestCompiler with ExpansionTest {
     val f = printer(g, "ExpansionParser", "expansion.scala")
   }
 
@@ -184,10 +184,25 @@ class ExpansionSpec extends FlatSpec with UnembeddedTester {
 
   "The ab | c grammar" should "not match the ac string" in {
     val (pos, r) = testGeneratedParsers(p, "ac")
-    assertResult(-\/("Error: Expected b, got c"))(r)
+    assertResult(-\/("Error: Expected b, got c."))(r)
     assert(pos == 1)
   }
 }
+
+class ExpansionSpec2 extends FlatSpec with UnembeddedTester {
+  val tester = new TestCompiler with ExpansionTest2 {
+    val f = printer(g, "ExpansionParser2", "expansion2.scala")
+  }
+
+  val p = new ExpansionParser2()
+
+  "The (a|b)c grammar" should "not match the ab string" in {
+    val (pos, r) = testGeneratedParsers(p, "ab")
+    assertResult(-\/("Error: Expected c, got b."))(r)
+    assert(pos == 1)
+  }
+}
+
 
 
 class StarSpec extends FlatSpec with UnembeddedTester {

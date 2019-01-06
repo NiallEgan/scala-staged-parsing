@@ -33,6 +33,12 @@ trait ExpansionTest extends GrammarNodes with LMSDriver {
       )
 }
 
+trait ExpansionTest2 extends GrammarNodes with LMSDriver {
+  val g: GrammarNode[Unit, (Char, Char)] =
+    PSeq(Alt(Character('a'), Character('b')),
+         Character('c'))
+}
+
 trait StarTest extends GrammarNodes with LMSDriver {
   val g: GrammarNode[Unit, List[Char]] =
     Star(Character('a'))

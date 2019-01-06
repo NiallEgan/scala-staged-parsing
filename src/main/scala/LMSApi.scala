@@ -25,7 +25,7 @@ trait LMSDriver extends lms.PrimitiveOps with lms.BooleanOps
 }
 
 trait DslExp extends LMSDriver with lms.PrimitiveOpsExp with lms.BooleanOpsExpOpt
-             with lms.EqualExp with EitherOpsExp
+             with lms.EqualExp with EitherOpsExpOpt
              with lms.StringOpsExp with lms.IfThenElseExpOpt
              with lms.TupleOpsExp
              with lms.ListOpsExpOpt with lms.TupledFunctionsExp

@@ -4,205 +4,188 @@ import Scalaz._
   Emitting Generated Code                  
 *******************************************/
 class DyckParser extends ((Int, java.lang.String)=>(Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]])) {
-def apply(x669:Int, x670:java.lang.String): Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]] = {
-val x675 = {(x671:Int,x672:java.lang.String) => 
-val x673 = throw new Exception("Bottom")
-x673: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
+def apply(x387:Int, x388:java.lang.String): Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]] = {
+val x393 = {(x389:Int,x390:java.lang.String) => 
+val x391 = throw new Exception("Bottom")
+x391: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
 }
-var x676: scala.Function2[Int,java.lang.String,Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]] = x675
-val x492 = List()
-val x493 = x492.right[java.lang.String]
-val x684 = {(x679:Int,x680:Unit) => 
-val x681 = x679
-val x683 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]](x681,x493)
-x683: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
+var x394: scala.Function2[Int,java.lang.String,Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]] = x393
+val x287 = List()
+val x288 = x287.right[java.lang.String]
+val x425 = {(x418:Int,x419:Tuple2[scala.collection.immutable.List[Char], scala.collection.immutable.List[Char]]) => 
+val x420 = x419._1
+val x421 = x419._2
+val x422 = x420 ::: x421
+val x423 = x422.right[java.lang.String]
+val x424 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]](x418,x423)
+x424: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
 }
-val x521 = ().right[java.lang.String]
-val x715 = {(x706:Int,x707:Tuple2[scala.collection.immutable.List[Char], scala.collection.immutable.List[Char]]) => 
-val x708 = x706
-val x709 = x707
-val x710 = x709._1
-val x711 = x709._2
-val x712 = x710 ::: x711
-val x713 = x712.right[java.lang.String]
-val x714 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]](x708,x713)
-x714: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
+val x417 = {(x409:Int,x410:Tuple2[scala.collection.immutable.List[Char], Char]) => 
+val x411 = x410._1
+val x412 = x410._2
+val x413 = List(x412)
+val x414 = x411 ::: x413
+val x415 = x414.right[java.lang.String]
+val x416 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]](x409,x415)
+x416: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
 }
-val x705 = {(x695:Int,x696:Tuple2[scala.collection.immutable.List[Char], Char]) => 
-val x697 = x695
-val x698 = x696
-val x699 = x698._1
-val x700 = x698._2
-val x701 = List(x700)
-val x702 = x699 ::: x701
-val x703 = x702.right[java.lang.String]
-val x704 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]](x697,x703)
-x704: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
+val x203 = "Error: Expected ), but reached end of input.".left[Char]
+val x408 = {(x401:Int,x402:Tuple2[Char, scala.collection.immutable.List[Char]]) => 
+val x403 = x402._1
+val x404 = x402._2
+val x405 = x403 :: x404
+val x406 = x405.right[java.lang.String]
+val x407 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]](x401,x406)
+x407: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
 }
-val x694 = {(x685:Int,x686:Tuple2[Char, scala.collection.immutable.List[Char]]) => 
-val x687 = x685
-val x688 = x686
-val x689 = x688._1
-val x690 = x688._2
-val x691 = x689 :: x690
-val x692 = x691.right[java.lang.String]
-val x693 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]](x687,x692)
-x693: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
+val x182 = "Error: Expected (, but reached end of input.".left[Char]
+val x520 = {(x395:Int,x396:java.lang.String) => 
+val x426 = x396.length
+val x427 = x395 < x426
+val x519 = if (x427) {
+val x428 = x396.charAt(x395)
+val x429 = x428 == '('
+val x518 = if (x429) {
+val x508 = {(x493:Int,x494:scala.collection.immutable.List[Char]) => 
+val x495 = x394
+val x497 = x495(x493,x396)
+val x503 = {(x498:Int,x499:scala.collection.immutable.List[Char]) => 
+val x500 = new Tuple2[scala.collection.immutable.List[Char], scala.collection.immutable.List[Char]](x494,x499)
+val x501 = x500.right[java.lang.String]
+val x502 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[scala.collection.immutable.List[Char], scala.collection.immutable.List[Char]]]](x498,x501)
+x502: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[scala.collection.immutable.List[Char], scala.collection.immutable.List[Char]]]]
 }
-val x294 = "Error: Expected (, but reached end of input.".left[Char]
-val x319 = "Error: Expected ), but reached end of input.".left[Char]
-val x901 = {(x677:Int,x678:java.lang.String) => 
-val x811 = x677
-val x812 = x678
-val x813 = x812.length
-val x814 = x811 < x813
-val x900 = if (x814) {
-val x815 = x812.charAt(x811)
-val x816 = '(' == x815
-val x899 = if (x816) {
-val x827 = if (x814) {
-val x817 = x815 == '('
-val x825 = if (x817) {
-val x818 = x811 + 1
-val x819 = x815.right[java.lang.String]
-val x820 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x818,x819)
-x820
+val x504 = x497._1
+val x505 = x497._2
+val x506 = x505 match {
+        case -\/(s) => (x504, -\/(s))
+        case \/-(t) => x503(x504, t)
+      }
+x506: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[scala.collection.immutable.List[Char], scala.collection.immutable.List[Char]]]]
+}
+val x486 = {(x462:Int,x463:scala.collection.immutable.List[Char]) => 
+val x482 = {(x477:Int,x478:Char) => 
+val x479 = new Tuple2[scala.collection.immutable.List[Char], Char](x463,x478)
+val x480 = x479.right[java.lang.String]
+val x481 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[scala.collection.immutable.List[Char], Char]]](x477,x480)
+x481: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[scala.collection.immutable.List[Char], Char]]]
+}
+val x464 = x462 < x426
+val x476 = if (x464) {
+val x465 = x396.charAt(x462)
+val x466 = x465 == ')'
+val x474 = if (x466) {
+val x467 = x462 + 1
+val x468 = x465.right[java.lang.String]
+val x469 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x467,x468)
+x469
 } else {
-val x821 = "Error: Expected (, got "+x815
-val x822 = x821+"."
-val x823 = x822.left[Char]
-val x824 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x811,x823)
-x824
+val x470 = "Error: Expected ), got "+x465
+val x471 = x470+"."
+val x472 = x471.left[Char]
+val x473 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x462,x472)
+x473
 }
-x825
+x474
 } else {
-val x826 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x811,x294)
-x826
+val x475 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x462,x203)
+x475
 }
-val x845 = {(x828:Int,x829:Char) => 
-val x832 = x676
-val x830 = x828
-val x834 = x832(x830,x812)
-val x831 = x829
-val x842 = {(x835:Int,x836:scala.collection.immutable.List[Char]) => 
-val x837 = x835
-val x838 = x836
-val x839 = new Tuple2[Char, scala.collection.immutable.List[Char]](x831,x838)
-val x840 = x839.right[java.lang.String]
-val x841 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, scala.collection.immutable.List[Char]]]](x837,x840)
-x841: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, scala.collection.immutable.List[Char]]]]
+val x483 = x476._1
+val x484 = x476._2
+val x485 = x484 match {
+        case -\/(s) => (x483, -\/(s))
+        case \/-(t) => x482(x483, t)
+      }
+x485: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[scala.collection.immutable.List[Char], Char]]]
 }
-val x843 = x834._2 match {
-        case -\/(s) => (x834._1, -\/(s))
-        case \/-(t) => x842(x834._1, t)
-      }
-x843: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, scala.collection.immutable.List[Char]]]]
+val x455 = {(x440:Int,x441:Char) => 
+val x442 = x394
+val x444 = x442(x440,x396)
+val x450 = {(x445:Int,x446:scala.collection.immutable.List[Char]) => 
+val x447 = new Tuple2[Char, scala.collection.immutable.List[Char]](x441,x446)
+val x448 = x447.right[java.lang.String]
+val x449 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, scala.collection.immutable.List[Char]]]](x445,x448)
+x449: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, scala.collection.immutable.List[Char]]]]
 }
-val x846 = x827._2 match {
-        case -\/(s) => (x827._1, -\/(s))
-        case \/-(t) => x845(x827._1, t)
+val x451 = x444._1
+val x452 = x444._2
+val x453 = x452 match {
+        case -\/(s) => (x451, -\/(s))
+        case \/-(t) => x450(x451, t)
       }
-val x847 = x846._2 match {
-        case -\/(s) => (x846._1, -\/(s))
-        case \/-(t) => x694(x846._1, t)
-      }
-val x874 = {(x848:Int,x849:scala.collection.immutable.List[Char]) => 
-val x850 = x848
-val x852 = x850 < x813
-val x864 = if (x852) {
-val x853 = x812.charAt(x850)
-val x854 = x853 == ')'
-val x862 = if (x854) {
-val x855 = x850 + 1
-val x856 = x853.right[java.lang.String]
-val x857 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x855,x856)
-x857
+x453: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, scala.collection.immutable.List[Char]]]]
+}
+val x439 = if (x427) {
+val x437 = if (x429) {
+val x430 = x395 + 1
+val x431 = x428.right[java.lang.String]
+val x432 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x430,x431)
+x432
 } else {
-val x858 = "Error: Expected ), got "+x853
-val x859 = x858+"."
-val x860 = x859.left[Char]
-val x861 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x850,x860)
-x861
+val x433 = "Error: Expected (, got "+x428
+val x434 = x433+"."
+val x435 = x434.left[Char]
+val x436 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x395,x435)
+x436
 }
-x862
+x437
 } else {
-val x863 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x850,x319)
-x863
+val x438 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x395,x182)
+x438
 }
-val x851 = x849
-val x872 = {(x865:Int,x866:Char) => 
-val x867 = x865
-val x868 = x866
-val x869 = new Tuple2[scala.collection.immutable.List[Char], Char](x851,x868)
-val x870 = x869.right[java.lang.String]
-val x871 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[scala.collection.immutable.List[Char], Char]]](x867,x870)
-x871: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[scala.collection.immutable.List[Char], Char]]]
-}
-val x873 = x864._2 match {
-        case -\/(s) => (x864._1, -\/(s))
-        case \/-(t) => x872(x864._1, t)
+val x456 = x439._1
+val x457 = x439._2
+val x458 = x457 match {
+        case -\/(s) => (x456, -\/(s))
+        case \/-(t) => x455(x456, t)
       }
-x873: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[scala.collection.immutable.List[Char], Char]]]
-}
-val x875 = x847._2 match {
-        case -\/(s) => (x847._1, -\/(s))
-        case \/-(t) => x874(x847._1, t)
+val x459 = x458._1
+val x460 = x458._2
+val x461 = x460 match {
+        case -\/(s) => (x459, -\/(s))
+        case \/-(t) => x408(x459, t)
       }
-val x876 = x875._2 match {
-        case -\/(s) => (x875._1, -\/(s))
-        case \/-(t) => x705(x875._1, t)
+val x487 = x461._1
+val x488 = x461._2
+val x489 = x488 match {
+        case -\/(s) => (x487, -\/(s))
+        case \/-(t) => x486(x487, t)
       }
-val x894 = {(x877:Int,x878:scala.collection.immutable.List[Char]) => 
-val x881 = x676
-val x879 = x877
-val x883 = x881(x879,x812)
-val x880 = x878
-val x891 = {(x884:Int,x885:scala.collection.immutable.List[Char]) => 
-val x886 = x884
-val x887 = x885
-val x888 = new Tuple2[scala.collection.immutable.List[Char], scala.collection.immutable.List[Char]](x880,x887)
-val x889 = x888.right[java.lang.String]
-val x890 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[scala.collection.immutable.List[Char], scala.collection.immutable.List[Char]]]](x886,x889)
-x890: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[scala.collection.immutable.List[Char], scala.collection.immutable.List[Char]]]]
-}
-val x892 = x883._2 match {
-        case -\/(s) => (x883._1, -\/(s))
-        case \/-(t) => x891(x883._1, t)
+val x490 = x489._1
+val x491 = x489._2
+val x492 = x491 match {
+        case -\/(s) => (x490, -\/(s))
+        case \/-(t) => x417(x490, t)
       }
-x892: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[scala.collection.immutable.List[Char], scala.collection.immutable.List[Char]]]]
-}
-val x895 = x876._2 match {
-        case -\/(s) => (x876._1, -\/(s))
-        case \/-(t) => x894(x876._1, t)
+val x509 = x492._1
+val x510 = x492._2
+val x511 = x510 match {
+        case -\/(s) => (x509, -\/(s))
+        case \/-(t) => x508(x509, t)
       }
-val x896 = x895._2 match {
-        case -\/(s) => (x895._1, -\/(s))
-        case \/-(t) => x715(x895._1, t)
+val x512 = x511._1
+val x513 = x511._2
+val x514 = x513 match {
+        case -\/(s) => (x512, -\/(s))
+        case \/-(t) => x425(x512, t)
       }
-x896
+x514
 } else {
-val x897 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Unit]](x811,x521)
-val x898 = x897._2 match {
-        case -\/(s) => (x897._1, -\/(s))
-        case \/-(t) => x684(x897._1, t)
-      }
-x898
+val x517 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]](x395,x288)
+x517
 }
-x899
+x518
 } else {
-val x897 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Unit]](x811,x521)
-val x898 = x897._2 match {
-        case -\/(s) => (x897._1, -\/(s))
-        case \/-(t) => x684(x897._1, t)
-      }
-x898
+val x517 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]](x395,x288)
+x517
 }
-x900: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
+x519: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.collection.immutable.List[Char]]]
 }
-x676 = x901
-val x903 = x676
-val x905 = x903(x669,x670)
-x905
+x394 = x520
+val x522 = x394
+val x524 = x522(x387,x388)
+x524
 }
 }
 /*****************************************

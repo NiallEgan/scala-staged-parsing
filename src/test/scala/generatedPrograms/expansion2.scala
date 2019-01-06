@@ -3,9 +3,46 @@ import Scalaz._
 /*****************************************
   Emitting Generated Code                  
 *******************************************/
-class AltParser extends ((Int, java.lang.String)=>(Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]])) {
-def apply(x0:Int, x1:java.lang.String): Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]] = {
+class ExpansionParser2 extends ((Int, java.lang.String)=>(Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, Char]]])) {
+def apply(x0:Int, x1:java.lang.String): Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, Char]]] = {
 val x2 = x1.length
+val x48 = "Error: Expected c, but reached end of input.".left[Char]
+val x60 = {(x35:Int,x36:Char) => 
+val x56 = {(x51:Int,x52:Char) => 
+val x53 = new Tuple2[Char, Char](x36,x52)
+val x54 = x53.right[java.lang.String]
+val x55 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, Char]]](x51,x54)
+x55: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, Char]]]
+}
+val x37 = x35 < x2
+val x50 = if (x37) {
+val x38 = x1.charAt(x35)
+val x39 = x38 == 'c'
+val x47 = if (x39) {
+val x40 = x35 + 1
+val x41 = x38.right[java.lang.String]
+val x42 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x40,x41)
+x42
+} else {
+val x43 = "Error: Expected c, got "+x38
+val x44 = x43+"."
+val x45 = x44.left[Char]
+val x46 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x35,x45)
+x46
+}
+x47
+} else {
+val x49 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x35,x48)
+x49
+}
+val x57 = x50._1
+val x58 = x50._2
+val x59 = x58 match {
+        case -\/(s) => (x57, -\/(s))
+        case \/-(t) => x56(x57, t)
+      }
+x59: Tuple2[Int, scalaz.$bslash$div[java.lang.String, scala.Tuple2[Char, Char]]]
+}
 val x3 = x0 < x2
 val x34 = if (x3) {
 val x4 = x1.charAt(x0)
@@ -69,7 +106,13 @@ val x32 = "Error: End of input encountered, but both branches still expecting in
 val x33 = new Tuple2[Int, scalaz.$bslash$div[java.lang.String, Char]](x0,x32)
 x33
 }
-x34
+val x61 = x34._1
+val x62 = x34._2
+val x63 = x62 match {
+        case -\/(s) => (x61, -\/(s))
+        case \/-(t) => x60(x61, t)
+      }
+x63
 }
 }
 /*****************************************

@@ -19,7 +19,7 @@ trait StagedCombinators extends LMSDriver with TypedGrammarNodes
                                             val firstSet: Set[Char])
       extends ((Rep[Int], Rep[String]) => Rep[(Int, \/[String, T])]) {
     def hasInFirstSet(c: Rep[Char]): Rep[Boolean] = {
-      def f(b: Rep[Boolean], o: Char) = unit(o) == c || b
+      def f(b: Rep[Boolean], o: Char) = b || c == o 
       firstSet.foldLeft(unit(false))(f)
     }
 
@@ -29,8 +29,8 @@ trait StagedCombinators extends LMSDriver with TypedGrammarNodes
   class StagedAltParser[T:Typ](isNullable: Boolean, firstSet: Set[Char],
                            val parser1: StagedParser[T], val parser2: StagedParser[T])
                            extends StagedParser[T](isNullable, firstSet) {
-    val branch1: Rep[((Int, String)) => (Int, \/[String, T])] = fun((i: Rep[Int], s: Rep[String]) => parser1(i, s))
-    val branch2: Rep[((Int, String)) => (Int, \/[String, T])] = fun((i: Rep[Int], s: Rep[String]) => parser2(i, s))
+    //val branch1: Rep[((Int, String)) => (Int, \/[String, T])] = fun((i: Rep[Int], s: Rep[String]) => parser1(i, s))
+    //val branch2: Rep[((Int, String)) => (Int, \/[String, T])] = fun((i: Rep[Int], s: Rep[String]) => parser2(i, s))
 
     override def apply(pos: Rep[Int], s: Rep[String]): Rep[(Int, \/[String, T])] = {
       if (pos < s.length) {

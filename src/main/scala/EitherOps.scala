@@ -38,8 +38,9 @@ trait EitherOpsExp extends EitherOps with lms.BaseExp with lms.StringOpsExp {
   override def either_bind[Le:Typ, Ri:Typ, B:Typ](o: Exp[\/[Le, Ri]],
                              f: Exp[Ri => \/[Le, B]]): Exp[\/[Le, B]] =
     EitherBind(o, f)
-  override def either_map[Le:Typ, Ri:Typ, B:Typ](o: Exp[\/[Le, Ri]], f: Exp[Ri => B]): Exp[\/[Le, B]] =
+  override def either_map[Le:Typ, Ri:Typ, B:Typ](o: Exp[\/[Le, Ri]], f: Exp[Ri => B]): Exp[\/[Le, B]] = {
     EitherMap(o, f)
+  }
 }
 
 trait EitherOpsExpOpt extends EitherOpsExp with lms.FunctionsExp {
@@ -49,6 +50,16 @@ trait EitherOpsExpOpt extends EitherOpsExp with lms.FunctionsExp {
         case (Def(EitherLeft(s, rightTyp)), _) => EitherLeft(s, typ[B])(typ[L], typ[B])
         case (Def(EitherRight(s, leftTyp)), Def(Lambda(f, _, _))) => f(s)
         case (_, _) => super.either_bind(o, f)
+      }
+  }
+
+  override def either_map[L: Typ, R:Typ, B:Typ](o: Exp[\/[L, R]],
+                                                f: Exp[R => B]) = {
+      println("foo")
+      (o, f) match {
+        case (Def(EitherLeft(s, rightTyp)), _) => EitherLeft(s, typ[B])(typ[L], typ[B])
+        case (Def(EitherRight(s, leftTyp)), Def(Lambda(f, _, _))) => EitherRight(f(s), typ[L])(typ[L], typ[B])
+        case (_, _) => super.either_map(o, f)
       }
   }
 }
