@@ -19,7 +19,7 @@ trait StagedCombinators extends LMSDriver with TypedGrammarNodes
                                             val firstSet: Set[Char])
       extends ((Rep[Int], Rep[String]) => Rep[(Int, \/[String, T])]) {
     def hasInFirstSet(c: Rep[Char]): Rep[Boolean] = {
-      def f(b: Rep[Boolean], o: Char) = b || c == o 
+      def f(b: Rep[Boolean], o: Char) = b || c == o
       firstSet.foldLeft(unit(false))(f)
     }
 
@@ -141,7 +141,7 @@ trait StagedCombinators extends LMSDriver with TypedGrammarNodes
       }
       case TVar(_, n) => StagedParserEnv.find(n, con)
       case s@TPMap(_, f, a) => new StagedMapParser(nullable, firstSet, parse(a, con)(s.fromTyp), f)(s.fromTyp, s.toTyp)
-      case p@TFix(_, a) => {
+      case TFix(_, a) => {
         new StagedFixParser[Ctx, T](nullable, firstSet, a, con)
       }
     }

@@ -9,19 +9,36 @@ trait TypeChecker {
     override type T[_] = ParserType
   }
 
-
   class ParserType(val first: Set[Char],
                    val follow: Set[Char],
                    val nullable: Boolean,
                    val guarded: Boolean) {
 
-      def hash[T](other: ParserType): Boolean = {
+      def hash(other: ParserType): Boolean = {
         !(other.nullable && nullable) && (other.first & first).isEmpty
       }
 
-      def *[T](other: ParserType): Boolean = {
-        // TODO: Check assoc here!
+      def *(other: ParserType): Boolean = {
         (other.follow & follow).isEmpty && (!nullable)
+      }
+
+      def seq(other: ParserType): ParserType = {
+        // Need to treat bottom as a special case as per the definitions of types
+        if (other.isInstanceOf[BottomType]) new BottomType()
+        else new ParserType(
+          first,
+          other.follow ++ (if (other.nullable) follow ++ other.first else Set()),
+          nullable && other.nullable,
+          guarded
+        )
+      }
+
+      def alt(other: ParserType): ParserType = {
+        new ParserType(
+         first ++ other.first,
+         follow ++ other.follow,
+         nullable || other.nullable,
+         guarded && other.guarded)
       }
 
       override def equals(other: Any): Boolean = other match {
@@ -37,19 +54,15 @@ trait TypeChecker {
       }
   }
 
+  class BottomType extends ParserType(Set(), Set(), false, true) { // TODO: Should it really be guarded?
+    override def seq(o: ParserType) = new BottomType()
+  }
+
+  class EpsType extends ParserType(Set(), Set(), true, true) {}
+
+  class CharType(c: Char) extends ParserType(Set(c), Set(), false, true) {}
 
   object TypeChecker {
-    private def seqType(t1: TypeEnv.T[_], t2: TypeEnv.T[_]): TypeEnv.T[_] = {
-      new ParserType(
-        t1.first,
-        t2.follow ++
-          (if (t2.nullable) t1.follow ++ t2.first
-           else Set()),
-        false,
-        t1.guarded
-      )
-    }
-
     private def fix_s[T](s: Stream[T], v: T): T = {
       // TODO:  Use iterators, iterate while etc.
       val v1 = s.head
@@ -63,20 +76,17 @@ trait TypeChecker {
     def pType[Ctx, A:Typ](typeContext: TypeEnv.Context[Ctx], exp: GrammarNode[Ctx, A]):
       \/[String, TypedGrammarNode[Ctx, A]] = {
       exp match {
-        case Eps() => suc(TEps[Ctx](new ParserType(Set(), Set(), true, true)))(unitTyp)
-        case Character(c) => suc(TCharacter[Ctx](new ParserType(Set(c), Set(), false, true), c))(charTyp)
-        //case Bot() => suc(TBot(new ParserType(Set(), Set(), false, true)))
+        case Eps() => suc(TEps[Ctx](new EpsType()))(unitTyp)
+        case Character(c) => suc(TCharacter[Ctx](new CharType(c), c))(charTyp)
+        // For some reason the fact that Nothing <: A causes the typing to normally fail below...
+        case Bot() => suc(TBot[Ctx](new BottomType()).asInstanceOf[TypedGrammarNode[Ctx, A]])(nothingTyp)
         case Alt(left, right) => {
           pType(typeContext, left) >>= (leftTypedNode => {
           pType(typeContext, right) >>= (rightTypedNode => {
             val leftType = leftTypedNode.tp
             val rightType = rightTypedNode.tp
             if (leftType hash rightType) {
-              suc(TAlt(new ParserType(
-               leftType.first ++ rightType.first,
-               leftType.follow ++ rightType.follow,
-               leftType.nullable || rightType.nullable,
-               leftType.guarded && rightType.guarded), leftTypedNode, rightTypedNode))
+              suc(TAlt(leftType alt rightType, leftTypedNode, rightTypedNode))
             } else err(f"Type Error: The alternatives $left and $right are ambiguous.")
             })})
           }
@@ -87,14 +97,14 @@ trait TypeChecker {
             val leftType = leftTypedNode.tp
             val rightType = rightTypedNode.tp
             if (leftType * rightType) {
-              suc(TPSeq(seqType(leftType, rightType), leftTypedNode, rightTypedNode)(s.leftTyp, s.rightTyp))
+              suc(TPSeq(leftType seq rightType, leftTypedNode, rightTypedNode)(s.leftTyp, s.rightTyp))
             } else err(f"Type Error: The sequence $left and $right are ambiguous.")
           })})
         }
         case PVar(v) => suc(TVar(TypeEnv.find(v, typeContext), v))
         case s@Star(a) => {
           for (typedNode <- pType(typeContext, a)(s.innerTyp);
-               innerType = seqType(typedNode.tp, typedNode.tp)) yield
+               innerType = typedNode.tp seq typedNode.tp) yield
           TStar(new ParserType(innerType.first, innerType.first ++ innerType.follow,
                              true, innerType.guarded), typedNode)(s.innerTyp)
         }
