@@ -28,7 +28,7 @@ class Compiler extends ScalaCompile with DslExp
 }
 
 trait ExampleProgram extends ParserProgram {
-  val g: D[Unit, (Char, Char)] = 'a' ~ ('b' <|> 'c')
+  val g: D[Unit, (Char, Char)] = 'a' ~ ('b' <|> 'c') // Change this
 }
 
 object Main {
