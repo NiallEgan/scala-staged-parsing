@@ -13,7 +13,6 @@ trait TypeChecker {
                    val follow: Set[Char],
                    val nullable: Boolean,
                    val guarded: Boolean) {
-
       def hash(other: ParserType): Boolean = {
         !(other.nullable && nullable) && (other.first & first).isEmpty
       }
@@ -54,7 +53,7 @@ trait TypeChecker {
       }
   }
 
-  class BottomType extends ParserType(Set(), Set(), false, true) { // TODO: Should it really be guarded?
+  class BottomType extends ParserType(Set(), Set(), false, true) {
     override def seq(o: ParserType) = new BottomType()
   }
 
@@ -113,8 +112,7 @@ trait TypeChecker {
           yield TPMap(typedNode.tp, f, typedNode)(s.fromTyp, s.toTyp)
         }
         case Fix(a) => {
-          // TODO: Why does this work.
-          val bottomType = new ParserType(Set(), Set(), false, false)
+          val bottomType: ParserType = new BottomType()
           val nextType: \/[String, TypeEnv.T[A]] => \/[String, TypeEnv.T[A]] =
             x => x >>= (
               (t: TypeEnv.T[A]) => pType(TypeEnv.add(t, typeContext), a).map(_.tp)

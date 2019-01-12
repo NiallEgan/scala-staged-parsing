@@ -134,7 +134,7 @@ class UnFixSpec extends FlatSpec with EmbeddedTester {
               )
         )
       ))
-      
+
     "The E ::= ac | bE grammar" should "unembed to ..." in {
       // TODO: Being overwhelmed by types!!!!
       val s: D[Unit, List[Char]] = fix(x => {
