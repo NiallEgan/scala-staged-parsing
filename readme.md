@@ -1,3 +1,4 @@
+
 # ssp - safe, staged parsing
 
 A **typed** parser combinator library that is **staged** for extra efficiency.
@@ -22,19 +23,19 @@ For example, the grammar ``E ::= ac | bE `` expressed in terms of parser combina
  })
 ```
 
-This is then compiled to this [recursive descent parser ](./src/test/scala/generatedPrograms/acbEprogram.scala).
+This is then compiled to this [recursive descent parser](./src/test/scala/generatedPrograms/acbEprogram.scala).
 
 ## Syntax
 The syntax is largely similar to the standard Scala parser combinator library with some differences.
 
 
-| Symbol  | Type      | Description  |
-| ------- | --------- | ------------ |
-| ``~ ``  | right-ali | $1600        |
-| ``<|>`` | centered  |   $12        |
-| ``??``  | are neat  |    $1        |
-| ``**``  | are neat  |    $1        |
-| ``^^``  | are neat  |    $1        |
-| ``'a'`` | are neat  |    $1        |
-| ``eps`` |           |              |
-| ``fix`` |           |              |
+| Symbol  | Type        | Description  |
+| ------- | ---------   | ------------ |
+| ``~ ``  | ``Parser[T] -> Parser[U] -> Parser[(T, U)]`` | Concatenation        |
+| ``<>`` | ``Parser[T] -> Parser[T] -> Parser[T]``  |   Alternation       |
+| ``??``  | ``Parser[T] -> Parser[\/[Unit, T]]``  |    Option (0 or 1)        |
+| ``**``  | ``Parser[T] -> Parser[List[T]]`` |    Kleene Star (0 or more)        |
+| ``^^``  | ``Parser[T] -> (Rep[T] -> Rep[U]) -> Parser[U]``  |   (Staged) Map        |
+| ``'a'`` | ``Parser[Char]``  |    Character parser for character 'a'        |
+| ``eps`` | ``Parser[Unit]``        |  Matches the empty string            |
+| ``fix`` | ``(Parser[T] -> Parser[T]) -> Parser[T]``          |      Least fixed point (for recursion)        |
