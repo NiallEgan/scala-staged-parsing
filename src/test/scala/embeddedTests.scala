@@ -5,6 +5,7 @@ import Scalaz._
 import org.scalatest.FlatSpec
 import lms.{common => lms}
 
+
 import scala.language.postfixOps
 
 trait EmbeddedTester extends Hoas with GrammarNodes with DslExp {
@@ -134,7 +135,7 @@ class UnFixSpec extends FlatSpec with EmbeddedTester {
               )
         )
       ))
-      
+
     "The E ::= ac | bE grammar" should "unembed to ..." in {
       // TODO: Being overwhelmed by types!!!!
       val s: D[Unit, List[Char]] = fix(x => {

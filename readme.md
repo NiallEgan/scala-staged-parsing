@@ -1,4 +1,5 @@
 
+
 # ssp - safe, staged parsing
 
 A **typed** parser combinator library that is **staged** for extra efficiency.
@@ -39,3 +40,16 @@ The syntax is largely similar to the standard Scala parser combinator library wi
 | ``'a'`` | ``Parser[Char]``  |    Character parser for character 'a'        |
 | ``eps`` | ``Parser[Unit]``        |  Matches the empty string            |
 | ``fix`` | ``(Parser[T] -> Parser[T]) -> Parser[T]``          |      Least fixed point (for recursion)        |
+
+## Usage
+ssp has dependencies on `lms` and `scalaz`. It isn't packaged properly, but `sbt build` should compile the library.  
+
+To generate a recursive descent parser, create an instance of the `Compiler` trait, overriding the parser value, and then call `compile(parser, className, fileName)`. For example:
+
+```
+object abcCompiler extends Compiler {
+  val parser = 'a' ~ ('b' <|> 'c')
+}
+```
+
+And then call: ``abcCompiler.compile(abcCompiler.parser, "class", "file")`` to generate a fast, specialised and safe parser.
